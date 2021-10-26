@@ -1,0 +1,181 @@
+name: northwind
+
+# extensions:
+# - name: dapr
+#   log-level: debug
+#   config: appconfig
+#   components-path: "./components/"
+# - name: zipkin
+# - name: elastic
+#   logPath: ./.logs
+
+services:
+
+- name: redis
+  image: redis:6.2.5-alpine
+  bindings:
+    - port: 6379
+  tags:
+    - inf
+
+- name: redis-cli
+  image: redis
+  args: "redis-cli -h redis MONITOR"
+  tags:
+    - inf
+
+- name: postgres
+  image: debezium/postgres
+  env_file:
+    - .env
+  bindings:
+    - port: 5432
+      connectionString: Server=${host};Port=${port};User Id=${env:POSTGRES_USER};Password=${env:POSTGRES_PASSWORD};
+  tags:
+    - inf
+
+- name: zookeeper
+  image: debezium/zookeeper:latest
+  bindings:
+    - name: "2181"
+      containerPort: 2181
+      port: 2181
+    - name: "2888"
+      containerPort: 2888
+      port: 2888
+    - name: "3888"
+      containerPort: 3888
+      port: 3888
+  tags:
+    - inf
+
+- name: kafka
+  image: debezium/kafka:latest
+  env:
+    - ZOOKEEPER_CONNECT=zookeeper:2181
+    - KAFKA_LISTENERS=INTERNAL://:29092,EXTERNAL://:9092
+    - KAFKA_ADVERTISED_LISTENERS=INTERNAL://kafka:29092,EXTERNAL://kafka:9092
+    - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+    - KAFKA_INTER_BROKER_LISTENER_NAME=INTERNAL
+    - KAFKA_ZOOKEEPER_SESSION_TIMEOUT=6000
+    - KAFKA_RESTART_ATTEMPTS=10
+    - KAFKA_RESTART_DELAY=5
+    - ZOOKEEPER_AUTOPURGE_PURGE_INTERVAL=0
+  bindings:
+    - containerPort: 9092
+      port: 9092
+  tags:
+    - inf
+
+- name: schema-registry
+  image: confluentinc/cp-schema-registry:6.1.0
+  env:
+    - SCHEMA_REGISTRY_HOST_NAME=schema-registry
+    - SCHEMA_REGISTRY_LISTENERS=http://schema-registry:8081
+    - SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS=PLAINTEXT://kafka:29092
+  bindings:
+    - protocol: http
+      containerPort: 8081
+      port: 8081
+  tags:
+    - inf
+
+- name: connector
+  dockerFile: build/debezium-strimzi/Dockerfile
+  env:
+    - BOOTSTRAP_SERVERS=kafka:9092
+    - GROUP_ID=1
+    - CONFIG_STORAGE_TOPIC=connector_configs
+    - OFFSET_STORAGE_TOPIC=connector_offsets
+    - STATUS_STORAGE_TOPIC=connector_statuses
+    - KEY_CONVERTER=io.confluent.connect.avro.AvroConverter
+    - VALUE_CONVERTER=io.confluent.connect.avro.AvroConverter
+    - INTERNAL_KEY_CONVERTER=org.apache.kafka.connect.json.JsonConverter
+    - INTERNAL_VALUE_CONVERTER=org.apache.kafka.connect.json.JsonConverter
+    - CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL=http://schema-registry:8081
+    - CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL=http://schema-registry:8081
+  volumes:
+    - target: /kafka/connect/confluentinc-kafka-connect-jdbc-10.2.1/
+      source: build/debezium-strimzi/connectors/confluentinc-kafka-connect-jdbc-10.2.1/
+    - target: /kafka/connect/confluentinc-kafka-connect-elasticsearch-11.1.2/
+      source: build/debezium-strimzi/connectors/confluentinc-kafka-connect-elasticsearch-11.1.2/
+  bindings:
+    - protocol: http
+      containerPort: 8083
+      port: 8083
+  tags:
+    - inf
+
+# - name: connectors-setup
+#   image: jwilder/dockerize
+#   args: dockerize -wait http://connector:8083/connectors -timeout 3m sh /scripts/init.sh
+#   volumes:
+#     - target: /scripts
+#       source: build/debezium-strimzi/scripts
+#   tags:
+#     - inf
+
+- name: kafdrop
+  image: obsidiandynamics/kafdrop:3.27.0
+  env:
+    - ZOOKEEPER_CONNECT=zookeeper:2181
+    - KAFKA_BROKERCONNECT=kafka:9092
+    - SCHEMAREGISTRY_CONNECT=http://schema-registry:8081
+    - JVM_OPTS=-Xms32M -Xmx64M
+    - SERVER_SERVLET_CONTEXTPATH="/"
+  bindings:
+    - protocol: http
+      containerPort: 9000
+      port: 9000
+  tags:
+    - inf
+
+- name: humanresourcesapp
+  project: HumanResources/HumanResources.csproj
+  env_file:
+    - .env
+  env:
+  - name: ConnectionStrings__postgres
+    value: Server=postgres;Port=5432;Database=${env:POSTGRES_DB};User Id=${env:POSTGRES_USER};Password=${env:POSTGRES_PASSWORD};
+  bindings:
+  - port: 5001
+
+- name: productcatalogapp
+  project: ProductCatalog/ProductCatalog.csproj
+  env_file:
+    - .env
+  env:
+  - name: ConnectionStrings__postgres
+    value: Server=postgres;Port=5432;Database=${env:POSTGRES_DB};User Id=${env:POSTGRES_USER};Password=${env:POSTGRES_PASSWORD};
+  bindings:
+  - port: 5002
+
+- name: salepaymentapp
+  project: SalePayment/SalePayment.csproj
+  env_file:
+    - .env
+  env:
+  - name: ConnectionStrings__postgres
+    value: Server=postgres;Port=5432;Database=${env:POSTGRES_DB};User Id=${env:POSTGRES_USER};Password=${env:POSTGRES_PASSWORD};
+  bindings:
+  - port: 5003
+
+- name: shippingapp
+  project: Shipping/Shipping.csproj
+  env_file:
+    - .env
+  env:
+  - name: ConnectionStrings__postgres
+    value: Server=postgres;Port=5432;Database=${env:POSTGRES_DB};User Id=${env:POSTGRES_USER};Password=${env:POSTGRES_PASSWORD};
+  bindings:
+  - port: 5004
+
+- name: customerserviceapp
+  project: CustomerService/CustomerService.csproj
+  env_file:
+    - .env
+  env:
+  - name: ConnectionStrings__postgres
+    value: Server=postgres;Port=5432;Database=${env:POSTGRES_DB};User Id=${env:POSTGRES_USER};Password=${env:POSTGRES_PASSWORD};
+  bindings:
+  - port: 5005

@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+      <TargetFramework>net6.0</TargetFramework>
+      <Nullable>enable</Nullable>
+      <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.0-rc.2.21480.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.0-rc.2.21480.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\shared\N8T.Core\N8T.Core.csproj" />
+    <ProjectReference Include="..\shared\N8T.Infrastructure.EfCore\N8T.Infrastructure.EfCore.csproj" />
+    <ProjectReference Include="..\shared\N8T.Infrastructure\N8T.Infrastructure.csproj" />
+    <ProjectReference Include="..\shared\Northwind.IntegrationEvents\Northwind.IntegrationEvents.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Microsoft.EntityFrameworkCore" />
+    <Using Include="System.Collections.ObjectModel" />
+    <Using Include="MediatR" />
+    <Using Include="FluentValidation" />
+    <Using Include="Dapr.Client" />
+    <Using Include="Confluent.SchemaRegistry" />
+    <Using Include="Avro.Specific" />
+    <Using Include="N8T.Core.Domain" />
+    <Using Include="N8T.Core.Repository" />
+    <Using Include="N8T.Core.Helpers" />
+    <Using Include="N8T.Core.Helpers.DateTimeHelper" Static="true" />
+    <Using Include="N8T.Infrastructure" />
+    <Using Include="N8T.Infrastructure.Bus" />
+    <Using Include="N8T.Infrastructure.DateTime" />
+    <Using Include="N8T.Infrastructure.Controller" />
+    <Using Include="N8T.Infrastructure.EfCore" />
+    <Using Include="N8T.Infrastructure.ErrorHandler" />
+    <Using Include="N8T.Infrastructure.SchemaRegistry" />
+    <Using Include="Northwind.IntegrationEvents" />
+  </ItemGroup>
+
+</Project>
