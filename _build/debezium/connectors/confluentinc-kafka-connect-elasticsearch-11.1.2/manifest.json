@@ -1,0 +1,37 @@
+{
+  "name" : "kafka-connect-elasticsearch",
+  "version" : "11.1.2",
+  "title" : "Kafka Connect Elasticsearch",
+  "description" : "The Elasticsearch connector allows moving data from Kafka to Elasticsearch 2.x, 5.x, 6.x, and 7.x. It writes data from a topic in Kafka to an index in Elasticsearch and all data for a topic have the same type.\n\nElasticsearch is often used for text queries, analytics and as an key-value store (use cases). The connector covers both the analytics and key-value store use cases. For the analytics use case, each message is in Kafka is treated as an event and the connector uses topic+partition+offset as a unique identifier for events, which then converted to unique documents in Elasticsearch. For the key-value store use case, it supports using keys from Kafka messages as document ids in Elasticsearch and provides configurations ensuring that updates to a key are written to Elasticsearch in order. For both use cases, Elasticsearch’s idempotent write semantics guarantees exactly once delivery.\n\nMapping is the process of defining how a document, and the fields it contains, are stored and indexed. Users can explicitly define mappings for types in indices. When a mapping is not explicitly defined, Elasticsearch can determine field names and types from data, however, some types such as timestamp and decimal, may not be correctly inferred. To ensure that the types are correctly inferred, the connector provides a feature to infer a mapping from the schemas of Kafka messages.",
+  "owner" : {
+    "username" : "confluentinc",
+    "type" : "organization",
+    "name" : "Confluent, Inc.",
+    "url" : "https://confluent.io/",
+    "logo" : "assets/confluent.png"
+  },
+  "support" : {
+    "summary" : "This connector is <a href=\"https://www.confluent.io/subscription/\">supported by Confluent</a> as part of a <a href=\"https://www.confluent.io/product/confluent-platform/\">Confluent Platform</a> subscription.",
+    "url" : "https://docs.confluent.io/home/overview.html",
+    "logo" : "assets/confluent.png",
+    "provider_name" : "Confluent, Inc."
+  },
+  "tags" : [ "analytics", "search", "Elastic", "elasticsearch", "log" ],
+  "requirements" : [ "Elasticsearch 7.x" ],
+  "features" : {
+    "supported_encodings" : [ "any" ],
+    "single_message_transforms" : true,
+    "confluent_control_center_integration" : true,
+    "kafka_connect_api" : true
+  },
+  "logo" : "assets/elasticsearch.jpg",
+  "documentation_url" : "https://docs.confluent.io/kafka-connect-elasticsearch/current/index.html",
+  "source_url" : "https://github.com/confluentinc/kafka-connect-elasticsearch",
+  "docker_image" : { },
+  "license" : [ {
+    "name" : "Confluent Community License",
+    "url" : "http://www.confluent.io/confluent-community-license"
+  } ],
+  "component_types" : [ "sink" ],
+  "release_date" : "2021-09-11"
+}

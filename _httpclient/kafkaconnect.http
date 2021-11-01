@@ -1,0 +1,56 @@
+@host = http://localhost:8083
+
+###
+GET {{host}}/connectors HTTP/1.1
+content-type: application/json
+
+###
+GET {{host}}/connector-plugins HTTP/1.1
+Content-Type: application/json
+
+###
+GET {{host}}/connectors/product_outbox_source/config HTTP/1.1
+content-type: application/json
+
+###
+POST {{host}}/connectors HTTP/1.1
+content-type: application/json
+
+{
+    "name": "product_outbox_source",
+    "config": {
+      "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+      "tasks.max": "1",
+
+      "database.hostname": "postgres",
+      "database.port": "5432",
+      "database.user": "northwind",
+      "database.password": "P@ssw0rd",
+      "database.dbname": "northwind_db",
+      "database.server.name": "northwind",
+      "table.whitelist": "product_catalog.product_outboxes",
+
+      "slot.name": "product_slot",
+      "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+      "value.converter": "io.debezium.converters.ByteBufferConverter",
+      "value.converter.schemas.registry.url": "http://schema-registry:8081",
+      "include.schema.changes": "false",
+      "tombstones.on.delete" : "false",
+      "internal.key.converter": "org.apache.kafka.connect.json.JsonConverter",
+      "internal.value.converter": "org.apache.kafka.connect.json.JsonConverter",
+
+      "transforms": "outbox",
+      "transforms.outbox.type": "io.debezium.transforms.outbox.EventRouter",
+      "transforms.outbox.table.field.event.id": "id",
+      "transforms.outbox.table.field.event.key": "aggregate_id",
+      "transforms.outbox.table.field.event.type": "type",
+      "transforms.outbox.table.field.event.payload.id": "aggregate_id",
+      "transforms.outbox.table.fields.additional.placement": "type:header:eventType",
+      "transforms.outbox.route.by.field": "aggregate_type",
+      "transforms.outbox.route.topic.replacement": "product_cdc_events"
+    }
+}
+
+###
+DELETE {{host}}/connectors/product_outbox_source HTTP/1.1
+content-type: application/json

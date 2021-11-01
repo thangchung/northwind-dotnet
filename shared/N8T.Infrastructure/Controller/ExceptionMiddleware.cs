@@ -40,14 +40,16 @@ namespace N8T.Infrastructure.Controller
 
             if (exception is ValidationException validationException)
             {
-                await context.Response.WriteAsync(new ErrorDetailModel(context.Response.StatusCode,
-                    validationException.ValidationResultModel
-                        .Errors.Aggregate("", (a, b) => a + $"{b.Field}-{b.Message}\n")).ToString());
+                var validationErrorModel = ResultModel<string>.Create(validationException.ValidationResultModel
+                        .Errors.Aggregate("", (a, b) => a + $"{b.Field}-{b.Message}\n"), true, "Validation Error.")
+                    .ToString();
+
+                await context.Response.WriteAsync(validationErrorModel);
             }
             else
             {
                 await context.Response.WriteAsync(
-                    new ErrorDetailModel(context.Response.StatusCode, "Internal Server Error.").ToString());
+                    ResultModel<string>.Create("", true, "Internal Server Error.").ToString());
             }
         }
     }

@@ -1,0 +1,11 @@
+{
+    "namespace": "Northwind.IntegrationEvents",
+    "type": "record",
+    "name": "EmployeeUpdated",
+    "fields": [
+        {
+            "name": "Id",
+            "type": "string"
+        }
+    ]
+}

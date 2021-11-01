@@ -58,6 +58,11 @@ namespace N8T.Core.Domain
         {
             return new ResultModel<T>(data, isError, errorMessage);
         }
+
+        public override string ToString()
+        {
+            return JsonSerializer.Serialize(this);
+        }
     }
 
     public record ListResultModel<T>(List<T> Items, long TotalItems, int Page, int PageSize) where T : notnull
@@ -65,14 +70,6 @@ namespace N8T.Core.Domain
         public static ListResultModel<T> Create(List<T> items, long totalItems = 0, int page = 1, int pageSize = 20)
         {
             return new ListResultModel<T>(items, totalItems, page, pageSize);
-        }
-    }
-
-    public record ErrorDetailModel(int StatusCode, string Message)
-    {
-        public override string ToString()
-        {
-            return JsonSerializer.Serialize(this);
         }
     }
 }

@@ -64,6 +64,40 @@ namespace ProductCatalog.Data.Migrations
                     b.ToTable("categories", "product_catalog");
                 });
 
+            modelBuilder.Entity("ProductCatalog.Domain.Outbox.ProductOutbox", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("uuid_generate_v4()");
+
+                    b.Property<Guid>("AggregateId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("aggregate_id");
+
+                    b.Property<string>("AggregateType")
+                        .HasColumnType("text")
+                        .HasColumnName("aggregate_type");
+
+                    b.Property<byte[]>("Payload")
+                        .HasColumnType("bytea")
+                        .HasColumnName("payload");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("text")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id")
+                        .HasName("pk_product_outboxes");
+
+                    b.HasIndex("Id")
+                        .IsUnique()
+                        .HasDatabaseName("ix_product_outboxes_id");
+
+                    b.ToTable("product_outboxes", "product_catalog");
+                });
+
             modelBuilder.Entity("ProductCatalog.Domain.Product", b =>
                 {
                     b.Property<Guid>("Id")
@@ -73,7 +107,6 @@ namespace ProductCatalog.Data.Migrations
                         .HasDefaultValueSql("uuid_generate_v4()");
 
                     b.Property<Guid?>("CategoryId")
-                        .IsRequired()
                         .HasColumnType("uuid")
                         .HasColumnName("category_id");
 
@@ -171,8 +204,6 @@ namespace ProductCatalog.Data.Migrations
                     b.HasOne("ProductCatalog.Domain.Category", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
                         .HasConstraintName("fk_products_categories_category_temp_id1");
 
                     b.HasOne("ProductCatalog.Domain.SupplierInfo", "SupplierInfo")

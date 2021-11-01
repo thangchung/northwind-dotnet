@@ -2,9 +2,17 @@
 
 public class Product : EntityRootBase
 {
-    private Product() { }
+    private Product()
+    {
+    }
 
-    public string Name { get; private set; } = default!;
+    public Product(string name, bool discontinued)
+    {
+        Name = name;
+        Discontinued = discontinued;
+    }
+
+    public string Name { get; set; } = default!;
     public Guid? SupplierInfoId { get; private set; }
     public SupplierInfo? SupplierInfo { get; set; } = null!;
     public Guid? CategoryId { get; private set; }

@@ -81,7 +81,7 @@ services:
     - inf
 
 - name: connector
-  dockerFile: build/debezium-strimzi/Dockerfile
+  dockerFile: _build/debezium/Dockerfile
   env:
     - BOOTSTRAP_SERVERS=kafka:9092
     - GROUP_ID=1
@@ -96,24 +96,15 @@ services:
     - CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL=http://schema-registry:8081
   volumes:
     - target: /kafka/connect/confluentinc-kafka-connect-jdbc-10.2.1/
-      source: build/debezium-strimzi/connectors/confluentinc-kafka-connect-jdbc-10.2.1/
+      source: _build/debezium/connectors/confluentinc-kafka-connect-jdbc-10.2.1/
     - target: /kafka/connect/confluentinc-kafka-connect-elasticsearch-11.1.2/
-      source: build/debezium-strimzi/connectors/confluentinc-kafka-connect-elasticsearch-11.1.2/
+      source: _build/debezium/connectors/confluentinc-kafka-connect-elasticsearch-11.1.2/
   bindings:
     - protocol: http
       containerPort: 8083
       port: 8083
   tags:
     - inf
-
-# - name: connectors-setup
-#   image: jwilder/dockerize
-#   args: dockerize -wait http://connector:8083/connectors -timeout 3m sh /scripts/init.sh
-#   volumes:
-#     - target: /scripts
-#       source: build/debezium-strimzi/scripts
-#   tags:
-#     - inf
 
 - name: kafdrop
   image: obsidiandynamics/kafdrop:3.27.0
@@ -130,15 +121,15 @@ services:
   tags:
     - inf
 
-- name: humanresourcesapp
-  project: HumanResources/HumanResources.csproj
-  env_file:
-    - .env
-  env:
-  - name: ConnectionStrings__postgres
-    value: Server=postgres;Port=5432;Database=${env:POSTGRES_DB};User Id=${env:POSTGRES_USER};Password=${env:POSTGRES_PASSWORD};
-  bindings:
-  - port: 5001
+# - name: humanresourcesapp
+#   project: HumanResources/HumanResources.csproj
+#   env_file:
+#     - .env
+#   env:
+#   - name: ConnectionStrings__postgres
+#     value: Server=postgres;Port=5432;Database=${env:POSTGRES_DB};User Id=${env:POSTGRES_USER};Password=${env:POSTGRES_PASSWORD};
+#   bindings:
+#   - port: 5001
 
 - name: productcatalogapp
   project: ProductCatalog/ProductCatalog.csproj
@@ -160,22 +151,22 @@ services:
   bindings:
   - port: 5003
 
-- name: shippingapp
-  project: Shipping/Shipping.csproj
-  env_file:
-    - .env
-  env:
-  - name: ConnectionStrings__postgres
-    value: Server=postgres;Port=5432;Database=${env:POSTGRES_DB};User Id=${env:POSTGRES_USER};Password=${env:POSTGRES_PASSWORD};
-  bindings:
-  - port: 5004
+# - name: shippingapp
+#   project: Shipping/Shipping.csproj
+#   env_file:
+#     - .env
+#   env:
+#   - name: ConnectionStrings__postgres
+#     value: Server=postgres;Port=5432;Database=${env:POSTGRES_DB};User Id=${env:POSTGRES_USER};Password=${env:POSTGRES_PASSWORD};
+#   bindings:
+#   - port: 5004
 
-- name: customerserviceapp
-  project: CustomerService/CustomerService.csproj
-  env_file:
-    - .env
-  env:
-  - name: ConnectionStrings__postgres
-    value: Server=postgres;Port=5432;Database=${env:POSTGRES_DB};User Id=${env:POSTGRES_USER};Password=${env:POSTGRES_PASSWORD};
-  bindings:
-  - port: 5005
+# - name: customerserviceapp
+#   project: CustomerService/CustomerService.csproj
+#   env_file:
+#     - .env
+#   env:
+#   - name: ConnectionStrings__postgres
+#     value: Server=postgres;Port=5432;Database=${env:POSTGRES_DB};User Id=${env:POSTGRES_USER};Password=${env:POSTGRES_PASSWORD};
+#   bindings:
+#   - port: 5005

@@ -22,12 +22,26 @@ builder.Services.AddSchemeRedistry();
 
 builder.Services.AddKafkaConsumer(o =>
 {
-    o.Topic = "shipping_events";
-    o.GroupId = "shipping_events_group";
-    /*o.EventResolver = async (eventFullName, bytes, schemaRegistryClient) =>
+    o.Topic = "shippers_cdc_events";
+    o.GroupId = "shippers_cdc_events_group";
+    o.EventResolver = async (eventFullName, bytes, schemaRegistryClient) =>
     {
+        ISpecificRecord? result = null;
+        if (eventFullName == typeof(ShipperCreated).FullName)
+        {
+            result = await bytes.DeserializeAsync<ShipperCreated>(schemaRegistryClient);
+        }
+        else if (eventFullName == typeof(ShipperUpdated).FullName)
+        {
+            result = await bytes.DeserializeAsync<ShipperUpdated>(schemaRegistryClient);
+        }
+        else if (eventFullName == typeof(ShipperDeleted).FullName)
+        {
+            result = await bytes.DeserializeAsync<ShipperDeleted>(schemaRegistryClient);
+        }
+
         return result;
-    };*/
+    };
 });
 
 var app = builder.Build();

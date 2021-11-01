@@ -1,0 +1,40 @@
+{
+  "name" : "kafka-connect-jdbc",
+  "version" : "10.2.1",
+  "title" : "Kafka Connect JDBC",
+  "description" : "The JDBC source and sink connectors allow you to exchange data between relational databases and Kafka.\n\nThe JDBC source connector allows you to import data from any relational database with a JDBC driver into Kafka topics. By using JDBC, this connector can support a wide variety of databases without requiring custom code for each one.\n\nData is loaded by periodically executing a SQL query and creating an output record for each row in the result set. By default, all tables in a database are copied, each to its own output topic. The database is monitored for new or deleted tables and adapts automatically. When copying data from a table, the connector can load only new or modified rows by specifying which columns should be used to detect new or modified data.\n\nThe JDBC sink connector allows you to export data from Kafka topics to any relational database with a JDBC driver. By using JDBC, this connector can support a wide variety of databases without requiring a dedicated connector for each one. The connector polls data from Kafka to write to the database based on the topics subscription. It is possible to achieve idempotent writes with upserts. Auto-creation of tables, and limited auto-evolution is also supported.",
+  "owner" : {
+    "username" : "confluentinc",
+    "type" : "organization",
+    "name" : "Confluent, Inc.",
+    "url" : "https://confluent.io/",
+    "logo" : "assets/confluent.png"
+  },
+  "support" : {
+    "summary" : "Confluent supports the JDBC sink and source connectors alongside community members as part of its Confluent Platform offering.",
+    "url" : "https://docs.confluent.io/current/",
+    "logo" : "assets/confluent.png",
+    "provider_name" : "Confluent, Inc."
+  },
+  "tags" : [ "rdbms", "oracle", "sybase", "vertica", "sqlite", "jdbc", "dbms", "sql server", "sql", "database", "postgresql", "db2", "derby", "mysql", "sap hana" ],
+  "features" : {
+    "supported_encodings" : [ "any" ],
+    "single_message_transforms" : true,
+    "confluent_control_center_integration" : true,
+    "kafka_connect_api" : true
+  },
+  "logo" : "assets/jdbc.jpg",
+  "documentation_url" : "https://docs.confluent.io/kafka-connect-jdbc/current/",
+  "source_url" : "https://github.com/confluentinc/kafka-connect-jdbc",
+  "docker_image" : {
+    "namespace" : "confluentinc",
+    "name" : "cp-kafka-connect",
+    "tag" : "10.2.1"
+  },
+  "license" : [ {
+    "name" : "Confluent Community License",
+    "url" : "https://www.confluent.io/confluent-community-license"
+  } ],
+  "component_types" : [ "sink", "source" ],
+  "release_date" : "2021-07-30"
+}

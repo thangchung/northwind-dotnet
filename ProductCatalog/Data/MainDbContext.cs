@@ -1,4 +1,5 @@
 using ProductCatalog.Domain;
+using ProductCatalog.Domain.Outbox;
 
 namespace ProductCatalog.Data;
 
@@ -53,11 +54,20 @@ public class MainDbContext : AppDbContextBase
         modelBuilder.Entity<Product>()
             .HasOne(x => x.Category)
             .WithMany()
-            .HasForeignKey(x => x.CategoryId)
-            .IsRequired();
+            .HasForeignKey(x => x.CategoryId);
 
         modelBuilder.Entity<Product>()
             .HasOne(x => x.SupplierInfo);
+
+        // outbox
+        modelBuilder.Entity<ProductOutbox>().ToTable("product_outboxes", Schema);
+        modelBuilder.Entity<ProductOutbox>().HasKey(x => x.Id);
+        modelBuilder.Entity<ProductOutbox>().Property(x => x.Id).HasColumnType("uuid")
+            .HasDefaultValueSql(Consts.UuidAlgorithm);
+
+        modelBuilder.Entity<ProductOutbox>().HasIndex(x => x.Id).IsUnique();
+        modelBuilder.Entity<ProductOutbox>().Ignore(x => x.Updated);
+        modelBuilder.Entity<ProductOutbox>().Ignore(x => x.DomainEvents);
     }
 }
 

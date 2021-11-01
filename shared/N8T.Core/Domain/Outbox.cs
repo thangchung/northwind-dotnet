@@ -1,22 +1,44 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace N8T.Core.Domain
 {
     public abstract class Outbox : EntityRootBase
     {
-        protected Outbox(Guid id, string type, string aggregateType, Guid aggregateId, byte[] payload)
-        {
-            Id = id;
-            Type = type;
-            AggregateType = aggregateType;
-            AggregateId = aggregateId;
-            Payload = payload;
-        }
+        public new Guid Id { get; set; }
+        public string Type { get; set; }
+        public string AggregateType { get; set; }
+        public Guid AggregateId { get; set; }
+        public byte[] Payload { get; set; }
 
-        public new Guid Id { get; private set; }
-        public string Type { get; private set; }
-        public string AggregateType { get; private set; }
-        public Guid AggregateId { get; private set; }
-        public byte[] Payload { get; private set; }
+        public bool Validate()
+        {
+            if (Guid.Empty == Id)
+            {
+                throw new ValidationException("Id of the Outbox entity couldn't be null.");
+            }
+
+            if (string.IsNullOrEmpty(Type))
+            {
+                throw new ValidationException("Type of the Outbox entity couldn't be null or empty.");
+            }
+
+            if (string.IsNullOrEmpty(AggregateType))
+            {
+                throw new ValidationException("AggregateType of the Outbox entity couldn't be null or empty.");
+            }
+
+            if (Guid.Empty == AggregateId)
+            {
+                throw new ValidationException("AggregateId of the Outbox entity couldn't be null.");
+            }
+
+            if (Payload is null)
+            {
+                throw new ValidationException("Payload of the Outbox entity couldn't be null (should be an Avro format).");
+            }
+
+            return true;
+        }
     }
 }

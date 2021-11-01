@@ -46,7 +46,7 @@ namespace N8T.Infrastructure.Bus.Kafka
             var schemaRegistryConfig = new SchemaRegistryConfig
             {
                 // Note: you can specify more than one schema registry url using the
-                // schema.registry.url property for redundancy (comma separated list). 
+                // schema.registry.url property for redundancy (comma separated list).
                 // The property name is not plural to follow the convention set by
                 // the Java implementation.
                 Url = _config.SchemaRegistryUrl
@@ -75,10 +75,10 @@ namespace N8T.Infrastructure.Bus.Kafka
                         var fullSchemaName = result.Message.Value.Schema.SchemaName.Fullname;
                         var genericRecord = result.Message.Value;
                         var bytes = await genericRecord.SerializeAsync(schemaRegistry);
-                        var @event = await _config.EventResolver?.Invoke(fullSchemaName, bytes, schemaRegistry);
+                        var @event = await _config.EventResolver?.Invoke(fullSchemaName, bytes, schemaRegistry)!;
 
-                        _logger.LogInformation($"Received {result.Message?.Key}-{result.Message?.Value?.GetType().FullName} message.");
-                        if (@event is not null && @event is INotification)
+                        _logger.LogInformation($"Received {result.Message?.Key!}-{result.Message?.Value?.GetType().FullName!} message.");
+                        if (@event is INotification)
                         {
                             await mediator.Publish(@event, stoppingToken);
                             _logger.LogInformation($"Dispatched {@event.GetType()?.FullName} event to internal handler.");

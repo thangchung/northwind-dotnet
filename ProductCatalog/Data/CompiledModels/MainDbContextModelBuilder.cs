@@ -14,6 +14,7 @@ namespace ProductCatalog
         partial void Initialize()
         {
             var category = CategoryEntityType.Create(this);
+            var productOutbox = ProductOutboxEntityType.Create(this);
             var product = ProductEntityType.Create(this);
             var supplierInfo = SupplierInfoEntityType.Create(this);
 
@@ -21,6 +22,7 @@ namespace ProductCatalog
             ProductEntityType.CreateForeignKey2(product, supplierInfo);
 
             CategoryEntityType.CreateAnnotations(category);
+            ProductOutboxEntityType.CreateAnnotations(productOutbox);
             ProductEntityType.CreateAnnotations(product);
             SupplierInfoEntityType.CreateAnnotations(supplierInfo);
 

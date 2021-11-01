@@ -7,9 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Data" />
     <Folder Include="Subscribers" />
-    <Folder Include="UseCases" />
   </ItemGroup>
 
   <ItemGroup>
@@ -40,6 +38,7 @@
     <Using Include="Avro.Specific" />
     <Using Include="N8T.Core.Domain" />
     <Using Include="N8T.Core.Repository" />
+    <Using Include="N8T.Core.Specification" />
     <Using Include="N8T.Core.Helpers" />
     <Using Include="N8T.Core.Helpers.DateTimeHelper" Static="true" />
     <Using Include="N8T.Infrastructure" />
