@@ -32,8 +32,8 @@ public abstract class MutateHandlerBase<TOutBoxEntity>
         var eventBytes = await @event.SerializeAsync(SchemaRegistryClient, topicName);
 
         outboxEntity.Id = Guid.NewGuid();
-        outboxEntity.Type = nameof(TEvent);
-        outboxEntity.AggregateType = nameof(TRootEntity);
+        outboxEntity.Type = typeof(TEvent).Name;
+        outboxEntity.AggregateType = typeof(TRootEntity).Name;
         outboxEntity.AggregateId = rootEntity.Id;
         outboxEntity.Payload = eventBytes;
         outboxEntity.Validate();
