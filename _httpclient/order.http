@@ -1,0 +1,27 @@
+@host = http://localhost:5003
+
+###
+@orderId = c576e54a-59a1-4a68-9da3-53f96f88d3ff
+GET {{host}}/v1/api/order/{{orderId}}/status HTTP/1.1
+content-type: application/json
+
+###
+POST {{host}}/v1/api/order HTTP/1.1
+content-type: application/json
+
+{
+    "orderId": "{{$guid}}",
+    "customerId": "c576e54a-59a1-4a68-9da3-53f96f88d3ff",
+    "employeeId": "c576e54a-59a1-4a68-9da3-53f96f88d3ff",
+    "orderDate": "2021-09-15T19:01:55.714942+03:00",
+    "requiredDate": "2021-09-15T19:01:55.714942+03:00"
+}
+
+###
+POST {{host}}/v1/api/payment HTTP/1.1
+content-type: application/json
+
+{
+    "orderId": "008765f8-3e46-4491-b3b4-c22fe1da9968",
+    "description": "PaymentFailed"
+}

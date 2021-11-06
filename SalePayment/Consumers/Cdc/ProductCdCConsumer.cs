@@ -1,7 +1,7 @@
 ﻿using SalePayment.Data;
 using SalePayment.Domain;
 
-namespace SalePayment.Consumers;
+namespace SalePayment.Consumers.Cdc;
 
 public class ProductCdCConsumer :
     INotificationHandler<ProductCreated>,

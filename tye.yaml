@@ -81,7 +81,8 @@ services:
     - inf
 
 - name: connector
-  dockerFile: _build/debezium/Dockerfile
+  # dockerFile: _build/debezium/Dockerfile
+  image: debezium/connect:1.7
   env:
     - BOOTSTRAP_SERVERS=kafka:9092
     - GROUP_ID=1
@@ -121,6 +122,28 @@ services:
   tags:
     - inf
 
+- name: rabbitmq
+  image: masstransit/rabbitmq:latest
+  bindings:
+    - name: "5672"
+      containerPort: 5672
+      port: 5672
+    - name: http15672
+      protocol: http
+      containerPort: 15672
+      port: 15672
+
+- name: mongo
+  image: mongo
+  bindings:
+    - name: http27017
+      protocol: http
+      containerPort: 27017
+      port: 27017
+    - name: "27019"
+      containerPort: 27019
+      port: 27019
+
 # - name: humanresourcesapp
 #   project: HumanResources/HumanResources.csproj
 #   env_file:
@@ -131,25 +154,25 @@ services:
 #   bindings:
 #   - port: 5001
 
-- name: productcatalogapp
-  project: ProductCatalog/ProductCatalog.csproj
-  env_file:
-    - .env
-  env:
-  - name: ConnectionStrings__postgres
-    value: Server=postgres;Port=5432;Database=${env:POSTGRES_DB};User Id=${env:POSTGRES_USER};Password=${env:POSTGRES_PASSWORD};
-  bindings:
-  - port: 5002
+# - name: productcatalogapp
+#   project: ProductCatalog/ProductCatalog.csproj
+#   env_file:
+#     - .env
+#   env:
+#   - name: ConnectionStrings__postgres
+#     value: Server=postgres;Port=5432;Database=${env:POSTGRES_DB};User Id=${env:POSTGRES_USER};Password=${env:POSTGRES_PASSWORD};
+#   bindings:
+#   - port: 5002
 
-- name: salepaymentapp
-  project: SalePayment/SalePayment.csproj
-  env_file:
-    - .env
-  env:
-  - name: ConnectionStrings__postgres
-    value: Server=postgres;Port=5432;Database=${env:POSTGRES_DB};User Id=${env:POSTGRES_USER};Password=${env:POSTGRES_PASSWORD};
-  bindings:
-  - port: 5003
+# - name: salepaymentapp
+#   project: SalePayment/SalePayment.csproj
+#   env_file:
+#     - .env
+#   env:
+#   - name: ConnectionStrings__postgres
+#     value: Server=postgres;Port=5432;Database=${env:POSTGRES_DB};User Id=${env:POSTGRES_USER};Password=${env:POSTGRES_PASSWORD};
+#   bindings:
+#   - port: 5003
 
 # - name: shippingapp
 #   project: Shipping/Shipping.csproj
