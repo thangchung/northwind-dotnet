@@ -1,9 +1,6 @@
 @host = http://localhost:5003
 
-###
-@orderId = c576e54a-59a1-4a68-9da3-53f96f88d3ff
-GET {{host}}/v1/api/order/{{orderId}}/status HTTP/1.1
-content-type: application/json
+
 
 ###
 POST {{host}}/v1/api/order HTTP/1.1
@@ -18,10 +15,38 @@ content-type: application/json
 }
 
 ###
+@orderId = 24fd5c32-bee4-488a-8c95-009c9f269f3c
+# GET {{host}}/v1/api/order/{{orderId}}/status HTTP/1.1
+# content-type: application/json
+
+###
 POST {{host}}/v1/api/payment HTTP/1.1
 content-type: application/json
 
 {
-    "orderId": "008765f8-3e46-4491-b3b4-c22fe1da9968",
-    "description": "PaymentFailed"
+    "orderId": "{{orderId}}",
+    "description": "PaymentFailed1"
+}
+
+###
+POST {{host}}/v1/api/shipment/{{orderId}}/pick HTTP/1.1
+content-type: application/json
+
+{
+    "orderId": "{{orderId}}",
+    "transactionId": "008765f8-3e46-4491-b3b4-c22fe1da9968",
+    "shipperId": "008765f8-3e46-4491-b3b4-c22fe1da9968",
+    "beFailedAt": "Dispatched1"
+}
+
+###
+POST {{host}}/v1/api/shipment/{{orderId}}/delivery HTTP/1.1
+content-type: application/json
+
+{
+    "orderId": "{{orderId}}",
+    "transactionId": "008765f8-3e46-4491-b3b4-c22fe1da9968",
+    "shipperId": "008765f8-3e46-4491-b3b4-c22fe1da9968",
+    "customerId": "008765f8-3e46-4491-b3b4-c22fe1da9968",
+    "beFailedAt": "Delivered1"
 }

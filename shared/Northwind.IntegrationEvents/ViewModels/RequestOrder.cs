@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Northwind.IntegrationEvents.Contracts;
+namespace Northwind.IntegrationEvents.ViewModels;
 
 public class RequestOrder
 {

@@ -2,8 +2,8 @@
 
 namespace Northwind.IntegrationEvents.Contracts;
 
-public interface ShipmentPrepared
+public interface MoneyRefunded
 {
     Guid OrderId { get; }
-    string TransactionId { get; set; }
+    Guid TransactionId { get; }
 }

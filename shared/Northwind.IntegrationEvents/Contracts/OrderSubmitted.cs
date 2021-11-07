@@ -2,7 +2,7 @@
 
 namespace Northwind.IntegrationEvents.Contracts;
 
-public interface OrderRequested
+public interface OrderSubmitted
 {
     Guid OrderId { get; }
     Guid CustomerId { get; }

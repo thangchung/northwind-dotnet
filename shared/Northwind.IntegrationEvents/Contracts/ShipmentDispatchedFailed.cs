@@ -2,10 +2,9 @@
 
 namespace Northwind.IntegrationEvents.Contracts;
 
-public interface ShipmentDelivered
+public interface ShipmentDispatchedFailed
 {
     Guid OrderId { get; }
     string TransactionId { get; set; }
     Guid ShipperId { get; }
-    Guid CustomerId { get; }
 }

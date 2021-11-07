@@ -4,6 +4,7 @@ using MassTransit.ConsumeConfigurators;
 using MassTransit.Definition;
 using MassTransit.KafkaIntegration;
 using Northwind.IntegrationEvents.Contracts;
+using Northwind.IntegrationEvents.ViewModels;
 
 namespace SalePayment.Consumers.MassTransit;
 
@@ -51,21 +52,21 @@ public class ProcessPaymentConsumer : IConsumer<ProcessPayment>
                     context.Message.OrderId,
                     Reason = $"Test cannot processing payment: {context.Message.OrderId}"
                 });
-
-            return;
         }
+        else
+        {
+            await _paymentProcessedTopicProducer.Produce(new {context.Message.OrderId});
 
-        await _paymentProcessedTopicProducer.Produce(new {context.Message.OrderId});
+            // todo: send notification to shipper hub (list of order need to ship)
+            // todo: in there some of shipper will pickup the ship order to ship
+            // ...
 
-        // todo: send notification to shipper hub (list of order need to ship)
-        // todo: in there some of shipper will pickup the ship order to ship
-        // ...
-
-        if (context.RequestId != null)
-            await context.RespondAsync<PaymentProcessed>(new
-            {
-                InVar.Timestamp,
-                context.Message.OrderId
-            });
+            if (context.RequestId != null)
+                await context.RespondAsync<PaymentProcessed>(new
+                {
+                    InVar.Timestamp,
+                    context.Message.OrderId
+                });
+        }
     }
 }

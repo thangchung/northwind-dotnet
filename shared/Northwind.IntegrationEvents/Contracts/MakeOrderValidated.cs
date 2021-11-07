@@ -2,7 +2,7 @@
 
 namespace Northwind.IntegrationEvents.Contracts;
 
-public interface CompensatePaymentFailProcessed
+public interface MakeOrderValidated
 {
     Guid OrderId { get; }
 }

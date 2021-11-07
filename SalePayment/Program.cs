@@ -2,6 +2,7 @@ using Confluent.Kafka;
 using MassTransit;
 using MassTransit.KafkaIntegration;
 using Northwind.IntegrationEvents.Contracts;
+using Northwind.IntegrationEvents.ViewModels;
 using SalePayment.Consumers.MassTransit;
 using SalePayment.Data;
 using SalePayment.Domain;
@@ -99,8 +100,10 @@ builder.Services.AddKafkaConsumer(o =>
 // Masstransit registration
 builder.Services.AddMassTransit(mt =>
 {
-    mt.AddConsumer<RequestOrderConsumer>(typeof(RequestOrderConsumerDefinition));
+    mt.AddConsumer<SubmitOrderConsumer>(typeof(SubmitOrderConsumerDefinition));
     mt.AddConsumer<ProcessPaymentConsumer>(typeof(ProcessPaymentConsumerDefinition));
+    mt.AddConsumer<PickShipmentConsumer>(typeof(PickShipmentConsumerDefinition));
+    mt.AddConsumer<DeliverShipmentConsumer>(typeof(DeliverShipmentConsumerDefinition));
 
     mt.SetKebabCaseEndpointNameFormatter();
 
@@ -111,26 +114,64 @@ builder.Services.AddMassTransit(mt =>
 
     mt.AddRider(rider =>
     {
-        rider.AddConsumer<CompensatePaymentFailProcessedConsumer>();
+        rider.AddConsumer<MoneyRefundedConsumer>();
+        rider.AddConsumer<MakeOrderValidatedConsumer>();
+        rider.AddConsumer<OrderConfirmedConsumer>();
 
         rider.AddSagaStateMachine<OrderStateMachine, OrderState, OrderStateMachineDefinition>()
+            /*.InMemoryRepository();*/
             .MongoDbRepository(r =>
             {
                 r.Connection = "mongodb://127.0.0.1";
                 r.DatabaseName = "orders";
             });
 
-        rider.AddProducer<OrderRequested>(nameof(OrderRequested));
+        rider.AddProducer<OrderSubmitted>(nameof(OrderSubmitted));
+        rider.AddProducer<OrderValidated>(nameof(OrderValidated));
+        rider.AddProducer<OrderValidatedFailed>(nameof(OrderValidatedFailed));
+        rider.AddProducer<OrderCancelled>(nameof(OrderCancelled));
         rider.AddProducer<PaymentProcessed>(nameof(PaymentProcessed));
         rider.AddProducer<PaymentProcessedFailed>(nameof(PaymentProcessedFailed));
+        rider.AddProducer<ShipmentPrepared>(nameof(ShipmentPrepared));
 
-        rider.AddProducer<CompensatePaymentFailProcessed>(nameof(CompensatePaymentFailProcessed));
+        rider.AddProducer<ShipmentDispatched>(nameof(ShipmentDispatched));
+        rider.AddProducer<ShipmentDispatchedFailed>(nameof(ShipmentDispatchedFailed));
+        rider.AddProducer<ShipmentDelivered>(nameof(ShipmentDelivered));
+        rider.AddProducer<ShipmentDeliveredFailed>(nameof(ShipmentDeliveredFailed));
+        rider.AddProducer<ShipmentCancelled>(nameof(ShipmentCancelled));
+
+        rider.AddProducer<OrderCompleted>(nameof(OrderCompleted));
+
+        rider.AddProducer<OrderConfirmed>(nameof(OrderConfirmed));
+        rider.AddProducer<MoneyRefunded>(nameof(MoneyRefunded));
+        rider.AddProducer<MakeOrderValidated>(nameof(MakeOrderValidated));
 
         rider.UsingKafka((context, k) =>
         {
             k.Host("localhost:9092");
 
-            k.TopicEndpoint<Null, OrderRequested>(nameof(OrderRequested), "Orders", c =>
+            k.TopicEndpoint<Null, OrderSubmitted>(nameof(OrderSubmitted), "Orders", c =>
+            {
+                c.AutoOffsetReset = AutoOffsetReset.Earliest;
+                c.CreateIfMissing(t => t.NumPartitions = 1);
+                c.ConfigureSaga<OrderState>(context);
+            });
+
+            k.TopicEndpoint<Null, OrderValidated>(nameof(OrderValidated), "Orders", c =>
+            {
+                c.AutoOffsetReset = AutoOffsetReset.Earliest;
+                c.CreateIfMissing(t => t.NumPartitions = 1);
+                c.ConfigureSaga<OrderState>(context);
+            });
+
+            k.TopicEndpoint<Null, OrderValidatedFailed>(nameof(OrderValidatedFailed), "Orders", c =>
+            {
+                c.AutoOffsetReset = AutoOffsetReset.Earliest;
+                c.CreateIfMissing(t => t.NumPartitions = 1);
+                c.ConfigureSaga<OrderState>(context);
+            });
+
+            k.TopicEndpoint<Null, OrderCancelled>(nameof(OrderCancelled), "Orders", c =>
             {
                 c.AutoOffsetReset = AutoOffsetReset.Earliest;
                 c.CreateIfMissing(t => t.NumPartitions = 1);
@@ -151,17 +192,82 @@ builder.Services.AddMassTransit(mt =>
                 c.ConfigureSaga<OrderState>(context);
             });
 
-            k.TopicEndpoint<Null, CompensatePaymentFailProcessed>(nameof(CompensatePaymentFailProcessed), "Orders", c =>
+            k.TopicEndpoint<Null, ShipmentPrepared>(nameof(ShipmentPrepared), "Orders", c =>
+            {
+                c.AutoOffsetReset = AutoOffsetReset.Earliest;
+                c.CreateIfMissing(t => t.NumPartitions = 1);
+                c.ConfigureSaga<OrderState>(context);
+            });
+
+            k.TopicEndpoint<Null, ShipmentDispatched>(nameof(ShipmentDispatched), "Orders", c =>
+            {
+                c.AutoOffsetReset = AutoOffsetReset.Earliest;
+                c.CreateIfMissing(t => t.NumPartitions = 1);
+                c.ConfigureSaga<OrderState>(context);
+            });
+
+            k.TopicEndpoint<Null, ShipmentDispatchedFailed>(nameof(ShipmentDispatchedFailed), "Orders", c =>
+            {
+                c.AutoOffsetReset = AutoOffsetReset.Earliest;
+                c.CreateIfMissing(t => t.NumPartitions = 1);
+                c.ConfigureSaga<OrderState>(context);
+            });
+
+            k.TopicEndpoint<Null, ShipmentDelivered>(nameof(ShipmentDelivered), "Orders", c =>
+            {
+                c.AutoOffsetReset = AutoOffsetReset.Earliest;
+                c.CreateIfMissing(t => t.NumPartitions = 1);
+                c.ConfigureSaga<OrderState>(context);
+            });
+
+            k.TopicEndpoint<Null, ShipmentDeliveredFailed>(nameof(ShipmentDeliveredFailed), "Orders", c =>
+            {
+                c.AutoOffsetReset = AutoOffsetReset.Earliest;
+                c.CreateIfMissing(t => t.NumPartitions = 1);
+                c.ConfigureSaga<OrderState>(context);
+            });
+
+            k.TopicEndpoint<Null, ShipmentCancelled>(nameof(ShipmentCancelled), "Orders", c =>
+            {
+                c.AutoOffsetReset = AutoOffsetReset.Earliest;
+                c.CreateIfMissing(t => t.NumPartitions = 1);
+                c.ConfigureSaga<OrderState>(context);
+            });
+
+            k.TopicEndpoint<Null, OrderCompleted>(nameof(OrderCompleted), "Orders", c =>
+            {
+                c.AutoOffsetReset = AutoOffsetReset.Earliest;
+                c.CreateIfMissing(t => t.NumPartitions = 1);
+                c.ConfigureSaga<OrderState>(context);
+            });
+
+            k.TopicEndpoint<Null, MoneyRefunded>(nameof(MoneyRefunded), "Orders", c =>
+            {
+                c.AutoOffsetReset = AutoOffsetReset.Earliest;
+                c.CreateIfMissing(t => t.NumPartitions = 1);
+                c.ConfigureConsumer<MoneyRefundedConsumer>(context);
+            });
+
+            k.TopicEndpoint<Null, MakeOrderValidated>(nameof(MakeOrderValidated), "Orders", c =>
+            {
+                c.AutoOffsetReset = AutoOffsetReset.Earliest;
+                c.CreateIfMissing(t => t.NumPartitions = 1);
+                c.ConfigureConsumer<MakeOrderValidatedConsumer>(context);
+            });
+
+            k.TopicEndpoint<Null, OrderConfirmed>(nameof(OrderConfirmed), "Orders", c =>
             {
                 c.AutoOffsetReset = AutoOffsetReset.Latest;
                 c.CreateIfMissing(t => t.NumPartitions = 1);
-                c.ConfigureConsumer<CompensatePaymentFailProcessedConsumer>(context);
+                c.ConfigureConsumer<OrderConfirmedConsumer>(context);
             });
         });
     });
 
     mt.AddRequestClient<RequestOrder>();
     mt.AddRequestClient<ProcessPayment>();
+    mt.AddRequestClient<PickShipmentByShipper>();
+    mt.AddRequestClient<DeliverShipmentForCustomer>();
     mt.AddRequestClient<CheckOrder>();
 });
 
@@ -187,84 +293,151 @@ app.UseSwaggerUI();
 
 await app.DoDbMigrationAsync(app.Logger);
 
-app.MapGet("/v1/api/order/{id}/status", async (Guid id, IRequestClient<CheckOrder> checkOrderClient) =>
-{
-    var (status, notFound) =
-        await checkOrderClient.GetResponse<OrderStatus, OrderNotFound>(new {OrderId = id});
+app.MapGet("/v1/api/order/{id}/status",
+    async (Guid id, IRequestClient<CheckOrder> checkOrderClient) =>
+    {
+        var (status, notFound) =
+            await checkOrderClient.GetResponse<OrderStatus, OrderNotFound>(new {OrderId = id});
 
-    if (status.IsCompletedSuccessfully)
-    {
-        var response = await status;
-        return Results.Ok(response.Message);
-    }
-    else
-    {
-        var response = await notFound;
-        return Results.NotFound(response.Message);
-    }
-});
-
-app.MapPost("/v1/api/order", async (RequestOrder model, IRequestClient<RequestOrder> requestOrderRequestClient) =>
-{
-    var (accepted, rejected) = await requestOrderRequestClient.GetResponse<OrderValidated, OrderValidatedFailed>(new
-    {
-        model.OrderId,
-        InVar.Timestamp,
-        model.CustomerId,
-        model.EmployeeId,
-        model.OrderDate,
-        model.RequiredDate
+        if (status.IsCompletedSuccessfully)
+        {
+            var response = await status;
+            return Results.Ok(response.Message);
+        }
+        else
+        {
+            var response = await notFound;
+            return Results.NotFound(response.Message);
+        }
     });
 
-    if (accepted.IsCompletedSuccessfully)
+app.MapPost("/v1/api/order",
+    async (RequestOrder model, IRequestClient<RequestOrder> requestOrderRequestClient) =>
     {
-        var response = await accepted;
+        var (accepted, rejected) =
+            await requestOrderRequestClient.GetResponse<OrderValidated, OrderValidatedFailed>(new
+            {
+                model.OrderId,
+                InVar.Timestamp,
+                model.CustomerId,
+                model.EmployeeId,
+                model.OrderDate,
+                model.RequiredDate
+            });
 
-        return Results.Ok(response);
-    }
+        if (accepted.IsCompletedSuccessfully)
+        {
+            var response = await accepted;
 
-    if (accepted.IsCompleted)
-    {
-        await accepted;
+            return Results.Ok(response);
+        }
 
-        return Results.Problem("Order was not accepted");
-    }
+        if (accepted.IsCompleted)
+        {
+            await accepted;
 
-    {
-        var response = await rejected;
+            return Results.Problem("Order was not accepted.");
+        }
 
-        return Results.BadRequest(response.Message);
-    }
-});
+        {
+            var response = await rejected;
 
-app.MapPost("/v1/api/payment", async (ProcessPayment model, IRequestClient<ProcessPayment> processPaymentRequestClient) =>
-{
-    var (accepted, rejected) = await processPaymentRequestClient.GetResponse<PaymentProcessed, PaymentProcessedFailed>(new
-    {
-        model.OrderId,
-        model.Description,
-        InVar.Timestamp
+            return Results.BadRequest(response.Message);
+        }
     });
 
-    if (accepted.IsCompletedSuccessfully)
+app.MapPost("/v1/api/payment",
+    async (ProcessPayment model, IRequestClient<ProcessPayment> processPaymentRequestClient) =>
     {
-        var response = await accepted;
+        var (accepted, rejected) =
+            await processPaymentRequestClient.GetResponse<PaymentProcessed, PaymentProcessedFailed>(new
+            {
+                model.OrderId, model.Description, InVar.Timestamp
+            });
 
-        return Results.Ok(response);
-    }
+        if (accepted.IsCompletedSuccessfully)
+        {
+            var response = await accepted;
 
-    if (accepted.IsCompleted)
+            return Results.Ok(response);
+        }
+
+        if (accepted.IsCompleted)
+        {
+            await accepted;
+
+            return Results.Problem("Payment was not accepted.");
+        }
+
+        {
+            var response = await rejected;
+
+            return Results.BadRequest(response.Message);
+        }
+    });
+
+app.MapPost("/v1/api/shipment/{orderId}/pick",
+    async (Guid orderId, PickShipmentByShipper model, IRequestClient<PickShipmentByShipper> pickShipmentRequestClient) =>
     {
-        await accepted;
+        model.OrderId = orderId;
 
-        return Results.Problem("Payment was not accepted");
-    }
+        var (accepted, rejected) =
+            await pickShipmentRequestClient.GetResponse<ShipmentDispatched, ShipmentDispatchedFailed>(new
+            {
+                model.OrderId, InVar.Timestamp, model.TransactionId, model.ShipperId, model.BeFailedAt
+            });
 
+        if (accepted.IsCompletedSuccessfully)
+        {
+            var response = await accepted;
+
+            return Results.Ok(response);
+        }
+
+        if (accepted.IsCompleted)
+        {
+            await accepted;
+
+            return Results.Problem("Shipment was not accepted.");
+        }
+
+        {
+            var response = await rejected;
+
+            return Results.BadRequest(response.Message);
+        }
+    });
+
+app.MapPost("/v1/api/shipment/{orderId}/delivery",
+    async (Guid orderId, DeliverShipmentForCustomer model, IRequestClient<DeliverShipmentForCustomer> deliverShipmentRequestClient) =>
     {
-        var response = await rejected;
+        model.OrderId = orderId;
 
-        return Results.BadRequest(response.Message);
-    }
-});
+        var (accepted, rejected) =
+            await deliverShipmentRequestClient.GetResponse<ShipmentDelivered, ShipmentDeliveredFailed>(new
+            {
+                model.OrderId, InVar.Timestamp, model.TransactionId, model.ShipperId, model.CustomerId, model.BeFailedAt
+            });
+
+        if (accepted.IsCompletedSuccessfully)
+        {
+            var response = await accepted;
+
+            return Results.Ok(response);
+        }
+
+        if (accepted.IsCompleted)
+        {
+            await accepted;
+
+            return Results.Problem("Shipment was not accepted.");
+        }
+
+        {
+            var response = await rejected;
+
+            return Results.BadRequest(response.Message);
+        }
+    });
 
 app.Run();

@@ -4,36 +4,37 @@ using MassTransit.ConsumeConfigurators;
 using MassTransit.Definition;
 using MassTransit.KafkaIntegration;
 using Northwind.IntegrationEvents.Contracts;
+using Northwind.IntegrationEvents.ViewModels;
 
 namespace SalePayment.Consumers.MassTransit;
 
-public class RequestOrderConsumerDefinition : ConsumerDefinition<RequestOrderConsumer>
+public class SubmitOrderConsumerDefinition : ConsumerDefinition<SubmitOrderConsumer>
 {
     private readonly IServiceProvider _serviceProvider;
 
-    public RequestOrderConsumerDefinition(IServiceProvider serviceProvider)
+    public SubmitOrderConsumerDefinition(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
         ConcurrentMessageLimit = 20;
     }
 
     protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator,
-        IConsumerConfigurator<RequestOrderConsumer> consumerConfigurator)
+        IConsumerConfigurator<SubmitOrderConsumer> consumerConfigurator)
     {
         endpointConfigurator.UseMessageRetry(r => r.Interval(3, 1000));
         endpointConfigurator.UseServiceScope(_serviceProvider);
     }
 }
 
-public class RequestOrderConsumer : IConsumer<RequestOrder>
+public class SubmitOrderConsumer : IConsumer<RequestOrder>
 {
-    private readonly ITopicProducer<OrderRequested> _orderRequestedTopicProducer;
-    private readonly ILogger<RequestOrderConsumer> _logger;
+    private readonly ITopicProducer<OrderSubmitted> _orderValidatedTopicProducer;
+    private readonly ILogger<SubmitOrderConsumer> _logger;
 
-    public RequestOrderConsumer(ITopicProducer<OrderRequested> orderRequestedTopicProducer,
-        ILogger<RequestOrderConsumer> logger)
+    public SubmitOrderConsumer(ITopicProducer<OrderSubmitted> orderValidatedTopicProducer,
+        ILogger<SubmitOrderConsumer> logger)
     {
-        _orderRequestedTopicProducer = orderRequestedTopicProducer;
+        _orderValidatedTopicProducer = orderValidatedTopicProducer;
         _logger = logger;
     }
 
@@ -61,7 +62,7 @@ public class RequestOrderConsumer : IConsumer<RequestOrder>
             return;
         }
 
-        await _orderRequestedTopicProducer.Produce(new
+        await _orderValidatedTopicProducer.Produce(new
         {
             context.Message.OrderId,
             context.Message.EmployeeId,
