@@ -5,7 +5,7 @@ namespace ProductCatalog.UseCases;
 
 public sealed class MutateProduct
 {
-    public record CreateCommand : ICreateCommand<ProductDto>
+    public record CreateCommand : ICreateCommand
     {
         public string Name { get; init; } = default!;
 
@@ -24,9 +24,9 @@ public sealed class MutateProduct
         }
     }
 
-    public record UpdateCommand : IUpdateCommand<Guid, ProductDto>
+    public record UpdateCommand : IUpdateCommand<Guid>
     {
-        public Guid Id { get; set; } = default!;
+        public Guid Id { get; set; }
         public string Name { get; set; } = default!;
 
         internal class CreateValidator : AbstractValidator<UpdateCommand>
@@ -42,7 +42,7 @@ public sealed class MutateProduct
         }
     }
 
-    public record DeleteCommand(Guid Id) : IDeleteCommand<Guid, bool>
+    public record DeleteCommand(Guid Id) : IDeleteCommand<Guid>
     {
         internal class CreateValidator : AbstractValidator<DeleteCommand>
         {
@@ -55,9 +55,9 @@ public sealed class MutateProduct
     }
 
     internal class Handler : MutateHandlerBase<ProductOutbox>,
-        IRequestHandler<CreateCommand, ResultModel<ProductDto>>,
-        IRequestHandler<UpdateCommand, ResultModel<ProductDto>>,
-        IRequestHandler<DeleteCommand, ResultModel<bool>>
+        IRequestHandler<CreateCommand, IResult>,
+        IRequestHandler<UpdateCommand, IResult>,
+        IRequestHandler<DeleteCommand, IResult>
     {
         private readonly IRepository<Product> _productRepository;
 
@@ -68,7 +68,7 @@ public sealed class MutateProduct
             _productRepository = productRepository;
         }
 
-        public async Task<ResultModel<ProductDto>> Handle(CreateCommand request, CancellationToken cancellationToken)
+        public async Task<IResult> Handle(CreateCommand request, CancellationToken cancellationToken)
         {
             var entity = request.ToProduct();
             var created = await _productRepository.AddAsync(entity, cancellationToken: cancellationToken);
@@ -82,11 +82,11 @@ public sealed class MutateProduct
                 ),
                 cancellationToken);
 
-            return ResultModel<ProductDto>.Create(
-                new ProductDto(created.Id, created.Name, created.Discontinued));
+            return Results.Ok(ResultModel<ProductDto>.Create(
+                new ProductDto(created.Id, created.Name, created.Discontinued)));
         }
 
-        public async Task<ResultModel<ProductDto>> Handle(UpdateCommand request, CancellationToken cancellationToken)
+        public async Task<IResult> Handle(UpdateCommand request, CancellationToken cancellationToken)
         {
             var entity = await _productRepository.FindById(request.Id, cancellationToken);
             if (entity is null)
@@ -108,11 +108,11 @@ public sealed class MutateProduct
                 ),
                 cancellationToken);
 
-            return ResultModel<ProductDto>.Create(
-                new ProductDto(updated.Id, updated.Name, updated.Discontinued));
+            return Results.Ok(ResultModel<ProductDto>.Create(
+                new ProductDto(updated.Id, updated.Name, updated.Discontinued)));
         }
 
-        public async Task<ResultModel<bool>> Handle(DeleteCommand request, CancellationToken cancellationToken)
+        public async Task<IResult> Handle(DeleteCommand request, CancellationToken cancellationToken)
         {
             var entity = await _productRepository.FindById(request.Id, cancellationToken);
             if (entity is null)
@@ -131,7 +131,7 @@ public sealed class MutateProduct
                 ),
                 cancellationToken);
 
-            return ResultModel<bool>.Create(true);
+            return Results.Ok(ResultModel<bool>.Create(true));
         }
     }
 }

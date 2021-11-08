@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Automatonymous.Visualizer" Version="5.1.3" />
     <PackageReference Include="MassTransit" Version="7.2.4" />
     <PackageReference Include="MassTransit.AspNetCore" Version="7.2.4" />
     <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="7.2.4" />
@@ -36,12 +37,21 @@
     <Using Include="MediatR" />
     <Using Include="FluentValidation" />
     <Using Include="Dapr.Client" />
+    <Using Include="Confluent.Kafka" />
     <Using Include="Confluent.SchemaRegistry" />
     <Using Include="Avro.Specific" />
+    <Using Include="MassTransit" />
+    <Using Include="MassTransit.Definition" />
+    <Using Include="MassTransit.Saga" />
+    <Using Include="MassTransit.KafkaIntegration" />
+    <Using Include="MongoDB.Bson.Serialization.Attributes" />
+    <Using Include="Automatonymous" />
+    <Using Include="GreenPipes" />
     <Using Include="N8T.Core.Domain" />
     <Using Include="N8T.Core.Repository" />
     <Using Include="N8T.Core.Helpers" />
     <Using Include="N8T.Core.Helpers.DateTimeHelper" Static="true" />
+    <Using Include="N8T.Core.Helpers.GuidHelper" Static="true" />
     <Using Include="N8T.Infrastructure" />
     <Using Include="N8T.Infrastructure.Bus" />
     <Using Include="N8T.Infrastructure.DateTime" />
@@ -50,6 +60,7 @@
     <Using Include="N8T.Infrastructure.ErrorHandler" />
     <Using Include="N8T.Infrastructure.SchemaRegistry" />
     <Using Include="Northwind.IntegrationEvents" />
+    <Using Include="Northwind.IntegrationEvents.Contracts" />
   </ItemGroup>
 
 </Project>

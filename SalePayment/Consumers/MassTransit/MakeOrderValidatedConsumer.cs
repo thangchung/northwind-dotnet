@@ -1,8 +1,4 @@
-﻿using MassTransit;
-using MassTransit.KafkaIntegration;
-using Northwind.IntegrationEvents.Contracts;
-
-namespace SalePayment.Consumers.MassTransit;
+﻿namespace SalePayment.Consumers.MassTransit;
 
 public class MakeOrderValidatedConsumer : IConsumer<MakeOrderValidated>
 {

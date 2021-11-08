@@ -1,50 +1,4 @@
-﻿using Automatonymous;
-using GreenPipes;
-using MassTransit;
-using MassTransit.Definition;
-using MassTransit.Saga;
-using MongoDB.Bson.Serialization.Attributes;
-using Northwind.IntegrationEvents.Contracts;
-
-namespace SalePayment.StateMachines;
-
-public class OrderState :
-    SagaStateMachineInstance,
-    ISagaVersion
-{
-    [BsonId]
-    public Guid CorrelationId { get; set; }
-    public int Version { get; set; }
-
-    public string CurrentState { get; set; } = default!;
-    public string FaultReason { get; set; }
-
-    public Guid OrderId { get; set; }
-
-    public Guid CustomerId { get; set; }
-    public Guid? EmployeeId { get; set;}
-    public DateTime OrderDate { get; set;}
-    public DateTime? RequiredDate { get; set; }
-
-    public decimal TotalMoney { get; set; }
-    public string TransactionId { get; set; }
-
-    public DateTime? Updated { get; set; }
-}
-
-public class OrderStateMachineDefinition : SagaDefinition<OrderState>
-{
-    public OrderStateMachineDefinition()
-    {
-        ConcurrentMessageLimit = 12;
-    }
-
-    protected override void ConfigureSaga(IReceiveEndpointConfigurator endpointConfigurator, ISagaConfigurator<OrderState> sagaConfigurator)
-    {
-        endpointConfigurator.UseMessageRetry(r => r.Intervals(500, 5000, 10000));
-        endpointConfigurator.UseInMemoryOutbox();
-    }
-}
+﻿namespace SalePayment.StateMachines;
 
 public class OrderStateMachine : MassTransitStateMachine<OrderState>
 {
@@ -194,22 +148,13 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                 {
                     Console.WriteLine($"[State Machine] shipment delivered ok for order={context.Instance.CorrelationId}.");
                 })
-                .TransitionTo(ShipmentDeliveredState),
+                .TransitionTo(OrderCompletedState),
             When(ShipmentDeliveredFailed)
                 .Then(context =>
                 {
                     Console.WriteLine($"[State Machine] shipment delivered failed for order={context.Instance.CorrelationId}.");
                 })
                 .TransitionTo(ShipmentCancelledState));
-
-        During(ShipmentDeliveredState,
-            Ignore(ShipmentDelivered),
-            When(OrderCompleted)
-                .Then(context =>
-                {
-                    Console.WriteLine($"[State Machine] order completed ok for order={context.Instance.CorrelationId}.");
-                })
-                .TransitionTo(OrderCompletedState));
 
         During(ShipmentCancelledState,
             Ignore(ShipmentDispatchedFailed),
@@ -260,7 +205,6 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
     public State ShipmentPreparedState { get; private set; }
 
     public State ShipmentDispatchedState { get; private set; }
-    public State ShipmentDeliveredState { get; private set; }
     public State ShipmentCancelledState { get; private set; }
     public State OrderCompletedState { get; private set; }
     public State OrderCancelledState { get; private set; }

@@ -1,39 +1,37 @@
 using System.Collections.Generic;
 using System.Text.Json;
 using MediatR;
+using Microsoft.AspNetCore.Http;
+using N8T.Core.Domain;
+using N8T.Core.Specification;
 
-namespace N8T.Core.Domain
+namespace N8T.Infrastructure
 {
-    public interface ICommand<T> : IRequest<ResultModel<T>>
-        where T : notnull
+    public interface ICommand : IRequest<IResult>
     {
     }
 
-    public interface IQuery<T> : IRequest<ResultModel<T>>
-        where T : notnull
+    public interface IQuery : IRequest<IResult>
     {
     }
 
-    public interface ICreateCommand<TResponse> : ICommand<TResponse>, ITxRequest where TResponse : notnull
+    public interface ICreateCommand : ICommand, ITxRequest
     {
     }
 
-    public interface IUpdateCommand<TId, TResponse> : ICommand<TResponse>, ITxRequest
+    public interface IUpdateCommand<TId> : ICommand, ITxRequest
         where TId : struct
-        where TResponse : notnull
     {
         public TId Id { get; set; }
     }
 
-    public interface IDeleteCommand<TId, TResponse> : ICommand<TResponse>
+    public interface IDeleteCommand<TId> : ICommand
         where TId : struct
-        where TResponse : notnull
     {
         public TId Id { get; init; }
     }
 
-    public interface IListQuery<TResponse> : IQuery<TResponse>
-        where TResponse : notnull
+    public interface IListQuery : IQuery
     {
         public List<string> Includes { get; init; }
         public List<FilterModel> Filters { get; init; }
@@ -42,15 +40,12 @@ namespace N8T.Core.Domain
         public int PageSize { get; init; }
     }
 
-    public interface IItemQuery<TId, TResponse> : IQuery<TResponse>
+    public interface IItemQuery<TId> : IQuery
         where TId : struct
-        where TResponse : notnull
     {
         public List<string> Includes { get; init; }
         public TId Id { get; init; }
     }
-
-    public record FilterModel(string FieldName, string Comparision, string FieldValue);
 
     public record ResultModel<T>(T Data, bool IsError = false, string ErrorMessage = default!) where T : notnull
     {

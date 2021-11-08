@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentValidation;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace N8T.Infrastructure.Validator
@@ -14,14 +15,14 @@ namespace N8T.Infrastructure.Validator
         where TRequest : notnull, IRequest<TResponse>
         where TResponse : notnull
     {
-        private readonly IValidator<TRequest> _validator;
         private readonly ILogger<RequestValidationBehavior<TRequest, TResponse>> _logger;
+        private readonly IServiceProvider _serviceProvider;
 
-        public RequestValidationBehavior(IValidator<TRequest> validator,
+        public RequestValidationBehavior(IServiceProvider serviceProvider,
             ILogger<RequestValidationBehavior<TRequest, TResponse>> logger)
         {
-            _validator = validator ?? throw new ArgumentNullException(nameof(validator));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _serviceProvider = serviceProvider;
+            _logger = logger;
         }
 
         public async Task<TResponse> Handle(TRequest request,
@@ -34,7 +35,11 @@ namespace N8T.Infrastructure.Validator
 
             _logger.LogDebug($"Handling {typeof(TRequest).FullName} with content {JsonSerializer.Serialize(request)}");
 
-            await _validator.HandleValidation(request);
+            var validator = _serviceProvider.GetService<IValidator<TRequest>>();
+            if (validator is not null)
+            {
+                await validator.HandleValidation(request);
+            }
 
             var response = await next();
 

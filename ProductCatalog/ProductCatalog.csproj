@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Using Include="Microsoft.AspNetCore.Mvc" />
     <Using Include="Microsoft.EntityFrameworkCore" />
     <Using Include="System.Collections.ObjectModel" />
     <Using Include="MediatR" />

@@ -74,7 +74,7 @@ namespace N8T.Infrastructure
 
         [DebuggerStepThrough]
         public static TResult SafeGetListQuery<TResult, TResponse>(this HttpContext httpContext, string query)
-            where TResult : IListQuery<TResponse>, new()
+            where TResult : IListQuery, new()
         {
             var queryModel = new TResult();
             if (!(string.IsNullOrEmpty(query) || query == "{}"))

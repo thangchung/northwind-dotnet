@@ -1,10 +1,9 @@
 ﻿namespace ProductCatalog.Domain.Specs;
 
-public sealed class EntityListQuerySpec<TEntity, TResponse> : GridSpecificationBase<TEntity>
+public sealed class EntityListQuerySpec<TEntity> : GridSpecificationBase<TEntity>
     where TEntity : notnull
-    where TResponse : notnull
 {
-    public EntityListQuerySpec(IListQuery<ListResultModel<TResponse>> gridQueryInput)
+    public EntityListQuerySpec(IListQuery gridQueryInput)
     {
         ApplyIncludeList(gridQueryInput.Includes);
 

@@ -1,14 +1,6 @@
-# Database schema
+# northwind-dotnet projects
 
-![](_docs/northwind-er-diagram.png)
+Implementing the specification of northwind application at https://github.com/thangchung/northwind-specs
 
-# Business Context
-
-![](_docs/business_context.png)
-
-# Create an Order Workflow
-
-![](_docs/create_order_wf.png)
-
-# Cool stuffs
+# Reference stuffs
 - https://minimal-apis.github.io/

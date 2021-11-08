@@ -5,7 +5,7 @@ namespace ProductCatalog.UseCases;
 
 public class GetProducts
 {
-    public record Query : IListQuery<ListResultModel<ProductDto>>
+    public record Query : IListQuery
     {
         public List<string> Includes { get; init; } = new(new[] {"SupplierInfo", "Category"});
         public List<FilterModel> Filters { get; init; } = new();
@@ -25,7 +25,7 @@ public class GetProducts
             }
         }
 
-        internal class Handler : IRequestHandler<Query, ResultModel<ListResultModel<ProductDto>>>
+        internal class Handler : IRequestHandler<Query, IResult>
         {
             private readonly IGridRepository<Product> _productRepository;
 
@@ -34,12 +34,12 @@ public class GetProducts
                 _productRepository = productRepository;
             }
 
-            public async Task<ResultModel<ListResultModel<ProductDto>>> Handle(Query request,
+            public async Task<IResult> Handle(Query request,
                 CancellationToken cancellationToken)
             {
                 if (request == null) throw new ArgumentNullException(nameof(request));
 
-                var spec = new EntityListQuerySpec<Product, ProductDto>(request);
+                var spec = new EntityListQuerySpec<Product>(request);
 
                 var products = await _productRepository.FindAsync(spec, cancellationToken);
 
@@ -51,7 +51,7 @@ public class GetProducts
                 var resultModel = ListResultModel<ProductDto>.Create(
                     productModels.ToList(), totalProducts, request.Page, request.PageSize);
 
-                return ResultModel<ListResultModel<ProductDto>>.Create(resultModel);
+                return Results.Ok(ResultModel<ListResultModel<ProductDto>>.Create(resultModel));
             }
         }
     }

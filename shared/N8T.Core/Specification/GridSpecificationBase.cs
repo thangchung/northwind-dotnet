@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using N8T.Core.Domain;
 
 namespace N8T.Core.Specification
 {
+    public record FilterModel(string FieldName, string Comparision, string FieldValue);
+
     public abstract class GridSpecificationBase<T> : IGridSpecification<T>
     {
         public virtual List<Expression<Func<T, bool>>> Criterias { get; } = new();
