@@ -12,14 +12,14 @@ using SalePayment.Data;
 namespace SalePayment.Data.Migrations
 {
     [DbContext(typeof(MainDbContext))]
-    [Migration("20211026144428_InitialSalePaymentDb")]
+    [Migration("20211109043126_InitialSalePaymentDb")]
     partial class InitialSalePaymentDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.0-rc.2.21480.5")
+                .HasAnnotation("ProductVersion", "6.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "uuid-ossp");

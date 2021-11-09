@@ -25,7 +25,7 @@ namespace Shipping
 
             AddAnnotation("Npgsql:PostgresExtension:uuid-ossp", ",,");
             AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-            AddAnnotation("ProductVersion", "6.0.0-rc.2.21480.5");
+            AddAnnotation("ProductVersion", "6.0.0");
             AddAnnotation("Relational:MaxIdentifierLength", 63);
         }
     }

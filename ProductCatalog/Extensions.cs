@@ -1,4 +1,4 @@
-﻿using ProductCatalog.Data;
+using ProductCatalog.Data;
 
 namespace ProductCatalog;
 
@@ -8,7 +8,7 @@ public static class Extensions
     {
         services.AddPostgresDbContext<MainDbContext>(
                 config.GetConnectionString("postgres"),
-                options => options.UseModel(ProductCatalog.MainDbContextModel.Instance),
+                options => options.UseModel(MainDbContextModel.Instance),
                 svc => svc.AddRepository(typeof(Repository<>)))
             .AddDatabaseDeveloperPageExceptionFilter();
 

@@ -1,4 +1,4 @@
-﻿using ProductCatalog.Domain;
+using ProductCatalog.Domain;
 using ProductCatalog.Domain.Specs;
 
 namespace ProductCatalog.UseCases;
@@ -34,10 +34,11 @@ public class GetProducts
                 _productRepository = productRepository;
             }
 
-            public async Task<IResult> Handle(Query request,
-                CancellationToken cancellationToken)
+            public async Task<IResult> Handle(Query request, CancellationToken cancellationToken)
             {
-                if (request == null) throw new ArgumentNullException(nameof(request));
+                // throw new Exception("throw this exception");
+
+                if (request is null) throw new ArgumentNullException(nameof(request));
 
                 var spec = new EntityListQuerySpec<Product>(request);
 

@@ -55,6 +55,7 @@ app.MapPost("/v1/api/shipment/{orderId}/delivery",
         model.OrderId = orderId;
         return await sender.Send(model);
     });
+
 app.MapGet("/v1/api/order-state-machine",
     (ISender sender) => sender.Send(new GetOrderStateMachine.Query()));
 

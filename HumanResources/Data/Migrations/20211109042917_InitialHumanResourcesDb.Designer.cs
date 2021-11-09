@@ -12,14 +12,14 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HumanResources.Data.Migrations
 {
     [DbContext(typeof(MainDbContext))]
-    [Migration("20211026144307_InitialHumanResourcesDb")]
+    [Migration("20211109042917_InitialHumanResourcesDb")]
     partial class InitialHumanResourcesDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.0-rc.2.21480.5")
+                .HasAnnotation("ProductVersion", "6.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "uuid-ossp");
@@ -41,7 +41,7 @@ namespace HumanResources.Data.Migrations
                     b.HasIndex("TerritoriesId")
                         .HasDatabaseName("ix_employee_territories_territories_id");
 
-                    b.ToTable("employee_territories", (string)null);
+                    b.ToTable("employee_territories", "human_resources");
                 });
 
             modelBuilder.Entity("HumanResources.Domain.Customer", b =>
@@ -371,7 +371,7 @@ namespace HumanResources.Data.Migrations
 
                             b1.HasKey("CustomerId");
 
-                            b1.ToTable("customers");
+                            b1.ToTable("customers", "human_resources");
 
                             b1.WithOwner()
                                 .HasForeignKey("CustomerId")
@@ -425,7 +425,7 @@ namespace HumanResources.Data.Migrations
 
                             b1.HasKey("EmployeeId");
 
-                            b1.ToTable("employees");
+                            b1.ToTable("employees", "human_resources");
 
                             b1.WithOwner()
                                 .HasForeignKey("EmployeeId")
@@ -476,7 +476,7 @@ namespace HumanResources.Data.Migrations
 
                             b1.HasKey("SupplierId");
 
-                            b1.ToTable("suppliers");
+                            b1.ToTable("suppliers", "human_resources");
 
                             b1.WithOwner()
                                 .HasForeignKey("SupplierId")

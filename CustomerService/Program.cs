@@ -19,8 +19,6 @@ builder.Services.AddPostgresDbContext<MainDbContext>(
 builder.Services.AddDaprClient();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSchemeRedistry();
-
 builder.Services.AddKafkaConsumer(o =>
 {
     o.Topic = "customers_cdc_events";
