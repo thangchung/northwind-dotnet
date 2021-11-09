@@ -187,6 +187,40 @@ namespace SalePayment.Data.Migrations
                     b.ToTable("order_details", "sale_payment");
                 });
 
+            modelBuilder.Entity("SalePayment.Domain.Outbox.OrderOutbox", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("uuid_generate_v4()");
+
+                    b.Property<Guid>("AggregateId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("aggregate_id");
+
+                    b.Property<string>("AggregateType")
+                        .HasColumnType("text")
+                        .HasColumnName("aggregate_type");
+
+                    b.Property<byte[]>("Payload")
+                        .HasColumnType("bytea")
+                        .HasColumnName("payload");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("text")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id")
+                        .HasName("pk_order_outboxes");
+
+                    b.HasIndex("Id")
+                        .IsUnique()
+                        .HasDatabaseName("ix_order_outboxes_id");
+
+                    b.ToTable("order_outboxes", "sale_payment");
+                });
+
             modelBuilder.Entity("SalePayment.Domain.ProductInfo", b =>
                 {
                     b.Property<Guid>("Id")

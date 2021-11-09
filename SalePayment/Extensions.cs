@@ -1,5 +1,6 @@
 ﻿using SalePayment.Consumers.MassTransit;
 using SalePayment.Data;
+using SalePayment.Data.Repository;
 using SalePayment.StateMachines;
 
 namespace SalePayment;
@@ -10,9 +11,14 @@ public static class Extensions
     {
         services.AddPostgresDbContext<MainDbContext>(
                 config.GetConnectionString("postgres"),
-                options => options.UseModel(SalePayment.MainDbContextModel.Instance),
+                options =>
+                {
+                    options.UseModel(SalePayment.MainDbContextModel.Instance);
+                },
                 svc => svc.AddRepository(typeof(Repository<>)))
             .AddDatabaseDeveloperPageExceptionFilter();
+
+        services.AddScoped<IOrderRepository, OrderRepository>();
 
         return services;
     }

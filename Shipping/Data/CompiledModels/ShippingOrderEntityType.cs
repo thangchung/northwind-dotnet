@@ -47,6 +47,13 @@ namespace Shipping
                 nullable: true);
             freight.AddAnnotation("Relational:ColumnName", "freight");
 
+            var orderId = runtimeEntityType.AddProperty(
+                "OrderId",
+                typeof(Guid),
+                propertyInfo: typeof(ShippingOrder).GetProperty("OrderId", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(ShippingOrder).GetField("<OrderId>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+            orderId.AddAnnotation("Relational:ColumnName", "order_id");
+
             var shipAddress = runtimeEntityType.AddProperty(
                 "ShipAddress",
                 typeof(string),

@@ -17,3 +17,5 @@ avrogen -s shipper_deleted.avsc .
 avrogen -s supplier_created.avsc .
 avrogen -s supplier_updated.avsc .
 avrogen -s supplier_deleted.avsc .
+
+avrogen -s order_created.avsc .

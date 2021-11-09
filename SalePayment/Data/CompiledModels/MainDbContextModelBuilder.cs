@@ -17,6 +17,7 @@ namespace SalePayment
             var employeeInfo = EmployeeInfoEntityType.Create(this);
             var order = OrderEntityType.Create(this);
             var orderDetails = OrderDetailsEntityType.Create(this);
+            var orderOutbox = OrderOutboxEntityType.Create(this);
             var productInfo = ProductInfoEntityType.Create(this);
 
             OrderEntityType.CreateForeignKey1(order, customerInfo);
@@ -28,6 +29,7 @@ namespace SalePayment
             EmployeeInfoEntityType.CreateAnnotations(employeeInfo);
             OrderEntityType.CreateAnnotations(order);
             OrderDetailsEntityType.CreateAnnotations(orderDetails);
+            OrderOutboxEntityType.CreateAnnotations(orderOutbox);
             ProductInfoEntityType.CreateAnnotations(productInfo);
 
             AddAnnotation("Npgsql:PostgresExtension:uuid-ossp", ",,");

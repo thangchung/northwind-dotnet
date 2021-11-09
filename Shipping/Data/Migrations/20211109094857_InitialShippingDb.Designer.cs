@@ -12,7 +12,7 @@ using Shipping.Data;
 namespace Shipping.Data.Migrations
 {
     [DbContext(typeof(MainDbContext))]
-    [Migration("20211109043215_InitialShippingDb")]
+    [Migration("20211109094857_InitialShippingDb")]
     partial class InitialShippingDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -72,6 +72,10 @@ namespace Shipping.Data.Migrations
                     b.Property<float?>("Freight")
                         .HasColumnType("real")
                         .HasColumnName("freight");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("order_id");
 
                     b.Property<string>("ShipAddress")
                         .HasColumnType("text")

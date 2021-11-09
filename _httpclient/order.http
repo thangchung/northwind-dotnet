@@ -9,16 +9,23 @@ POST {{host}}/v1/api/order HTTP/1.1
 content-type: application/json
 
 {
-    "customerId": "c576e54a-59a1-4a68-9da3-53f96f88d3ff",
+    "customerId": "50f51e5f-36c6-4582-b428-ac15d70d9012",
     "orderDate": "2021-09-15T19:01:55.714942+03:00",
-    "requiredDate": "2021-09-15T19:01:55.714942+03:00"
+    "requiredDate": "2021-09-15T19:01:55.714942+03:00",
+    "details": [
+        {
+            "productId": "88a6d251-d2ba-420a-822b-8c68ec9ce4eb",
+            "unitPrice": 1000,
+            "quantity": 1
+        }
+    ],
+    "failedAt": "VALIDATION_FAILED1"
 }
 
-# provide items which has been bought
-# provide ship information
+# todo: provide ship information
 
 ###
-@orderId = 148a21fd-0f75-4936-b1ee-be3514dfda60
+@orderId = 5934aac6-c52a-4aaa-9243-742bcc24126c
 # GET {{host}}/v1/api/order/{{orderId}}/status HTTP/1.1
 # content-type: application/json
 
@@ -41,7 +48,7 @@ content-type: application/json
     "orderId": "{{orderId}}",
     "shipperId": "008765f8-3e46-4491-b3b4-c22fe1da9968",
     "customerId": "008765f8-3e46-4491-b3b4-c22fe1da9968",
-    "beFailedAt": "Dispatched"
+    "beFailedAt": "Dispatched1"
 }
 
 ###

@@ -46,6 +46,22 @@ namespace SalePayment.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "order_outboxes",
+                schema: "sale_payment",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "uuid_generate_v4()"),
+                    type = table.Column<string>(type: "text", nullable: true),
+                    aggregate_type = table.Column<string>(type: "text", nullable: true),
+                    aggregate_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    payload = table.Column<byte[]>(type: "bytea", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_order_outboxes", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "products_info",
                 schema: "sale_payment",
                 columns: table => new
@@ -158,6 +174,13 @@ namespace SalePayment.Data.Migrations
                 column: "product_info_id");
 
             migrationBuilder.CreateIndex(
+                name: "ix_order_outboxes_id",
+                schema: "sale_payment",
+                table: "order_outboxes",
+                column: "id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "ix_orders_customer_info_id",
                 schema: "sale_payment",
                 table: "orders",
@@ -188,6 +211,10 @@ namespace SalePayment.Data.Migrations
         {
             migrationBuilder.DropTable(
                 name: "order_details",
+                schema: "sale_payment");
+
+            migrationBuilder.DropTable(
+                name: "order_outboxes",
                 schema: "sale_payment");
 
             migrationBuilder.DropTable(

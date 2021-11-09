@@ -44,6 +44,22 @@ builder.Services.AddKafkaConsumer(o =>
     };
 });
 
+builder.Services.AddKafkaConsumer(o =>
+{
+    o.Topic = "order_cdc_events";
+    o.GroupId = "order_cdc_events_group";
+    o.EventResolver = async (eventFullName, bytes, schemaRegistryClient) =>
+    {
+        ISpecificRecord? result = null;
+        if (eventFullName == typeof(OrderCreated).FullName)
+        {
+            result = await bytes.DeserializeAsync<OrderCreated>(schemaRegistryClient);
+        }
+
+        return result;
+    };
+});
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
@@ -63,3 +79,5 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 await app.DoDbMigrationAsync(app.Logger);
+
+app.Run();

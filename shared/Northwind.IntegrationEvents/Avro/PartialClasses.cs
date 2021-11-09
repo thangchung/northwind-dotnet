@@ -63,6 +63,10 @@ namespace Northwind.IntegrationEvents
     {
     }
 
+    public partial class OrderCreated : INotification
+    {
+    }
+
     public class DefaultValues
     {
         public static Guid AdminId { get; } = new Guid("870d16a3-bbf9-4f73-93b1-5146ce33039c");

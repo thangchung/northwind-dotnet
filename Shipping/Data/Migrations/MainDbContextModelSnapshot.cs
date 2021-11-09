@@ -71,6 +71,10 @@ namespace Shipping.Data.Migrations
                         .HasColumnType("real")
                         .HasColumnName("freight");
 
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("order_id");
+
                     b.Property<string>("ShipAddress")
                         .HasColumnType("text")
                         .HasColumnName("ship_address");

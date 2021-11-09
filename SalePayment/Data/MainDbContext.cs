@@ -1,4 +1,5 @@
 using SalePayment.Domain;
+using SalePayment.Domain.Outbox;
 
 namespace SalePayment.Data;
 
@@ -79,6 +80,16 @@ public class MainDbContext : AppDbContextBase
 
         modelBuilder.Entity<OrderDetails>()
             .HasOne(x => x.ProductInfo);
+
+        // outbox
+        modelBuilder.Entity<OrderOutbox>().ToTable("order_outboxes", Schema);
+        modelBuilder.Entity<OrderOutbox>().HasKey(x => x.Id);
+        modelBuilder.Entity<OrderOutbox>().Property(x => x.Id).HasColumnType("uuid")
+            .HasDefaultValueSql(Consts.UuidAlgorithm);
+
+        modelBuilder.Entity<OrderOutbox>().HasIndex(x => x.Id).IsUnique();
+        modelBuilder.Entity<OrderOutbox>().Ignore(x => x.Updated);
+        modelBuilder.Entity<OrderOutbox>().Ignore(x => x.DomainEvents);
     }
 }
 

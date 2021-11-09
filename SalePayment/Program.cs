@@ -1,4 +1,7 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using SalePayment;
+using SalePayment.Data;
 using SalePayment.Domain;
 using SalePayment.UseCases;
 
@@ -35,9 +38,10 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 await app.DoDbMigrationAsync(app.Logger);
+await app.DoSeedData(app.Logger);
 
 app.MapPost("/v1/api/order",
-    async (SubmitOrder.Command model, ISender sender) => await sender.Send(model));
+    async ([FromBody] SubmitOrder.Command model, ISender sender) => await sender.Send(model));
 
 app.MapPost("/v1/api/payment",
     async (ProcessPayment.Command model, ISender sender) => await sender.Send(model));

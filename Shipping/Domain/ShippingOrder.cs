@@ -4,6 +4,13 @@ public class ShippingOrder : EntityRootBase
 {
     private ShippingOrder() { }
 
+    public ShippingOrder(Guid orderId)
+    {
+        OrderId = orderId;
+    }
+
+    public Guid OrderId { get; private set; }
+
     public DateTime? ShippedDate { get; private set; }
     public Guid? ShipperInfoId { get; private set; } // ShipperId == ShipVia
     public ShipperInfo? ShipperInfo { get; private set; }

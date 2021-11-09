@@ -53,6 +53,7 @@ namespace Shipping.Data.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "uuid_generate_v4()"),
+                    order_id = table.Column<Guid>(type: "uuid", nullable: false),
                     shipped_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     shipper_info_id = table.Column<Guid>(type: "uuid", nullable: true),
                     freight = table.Column<float>(type: "real", nullable: true),
