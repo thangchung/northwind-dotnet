@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HumanResources.Data.Migrations
 {
     [DbContext(typeof(MainDbContext))]
-    [Migration("20211109042917_InitialHumanResourcesDb")]
+    [Migration("20211109121101_InitialHumanResourcesDb")]
     partial class InitialHumanResourcesDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -160,6 +160,142 @@ namespace HumanResources.Data.Migrations
                         .HasDatabaseName("ix_employees_reports_to_id");
 
                     b.ToTable("employees", "human_resources");
+                });
+
+            modelBuilder.Entity("HumanResources.Domain.OutBox.CustomerOutbox", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("uuid_generate_v4()");
+
+                    b.Property<Guid>("AggregateId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("aggregate_id");
+
+                    b.Property<string>("AggregateType")
+                        .HasColumnType("text")
+                        .HasColumnName("aggregate_type");
+
+                    b.Property<byte[]>("Payload")
+                        .HasColumnType("bytea")
+                        .HasColumnName("payload");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("text")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id")
+                        .HasName("pk_customer_outboxes");
+
+                    b.HasIndex("Id")
+                        .IsUnique()
+                        .HasDatabaseName("ix_customer_outboxes_id");
+
+                    b.ToTable("customer_outboxes", "human_resources");
+                });
+
+            modelBuilder.Entity("HumanResources.Domain.OutBox.EmployeeOutbox", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("uuid_generate_v4()");
+
+                    b.Property<Guid>("AggregateId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("aggregate_id");
+
+                    b.Property<string>("AggregateType")
+                        .HasColumnType("text")
+                        .HasColumnName("aggregate_type");
+
+                    b.Property<byte[]>("Payload")
+                        .HasColumnType("bytea")
+                        .HasColumnName("payload");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("text")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id")
+                        .HasName("pk_employee_outboxes");
+
+                    b.HasIndex("Id")
+                        .IsUnique()
+                        .HasDatabaseName("ix_employee_outboxes_id");
+
+                    b.ToTable("employee_outboxes", "human_resources");
+                });
+
+            modelBuilder.Entity("HumanResources.Domain.OutBox.ShipperOutbox", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("uuid_generate_v4()");
+
+                    b.Property<Guid>("AggregateId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("aggregate_id");
+
+                    b.Property<string>("AggregateType")
+                        .HasColumnType("text")
+                        .HasColumnName("aggregate_type");
+
+                    b.Property<byte[]>("Payload")
+                        .HasColumnType("bytea")
+                        .HasColumnName("payload");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("text")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id")
+                        .HasName("pk_shipper_outboxes");
+
+                    b.HasIndex("Id")
+                        .IsUnique()
+                        .HasDatabaseName("ix_shipper_outboxes_id");
+
+                    b.ToTable("shipper_outboxes", "human_resources");
+                });
+
+            modelBuilder.Entity("HumanResources.Domain.OutBox.SupplierOutbox", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("uuid_generate_v4()");
+
+                    b.Property<Guid>("AggregateId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("aggregate_id");
+
+                    b.Property<string>("AggregateType")
+                        .HasColumnType("text")
+                        .HasColumnName("aggregate_type");
+
+                    b.Property<byte[]>("Payload")
+                        .HasColumnType("bytea")
+                        .HasColumnName("payload");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("text")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id")
+                        .HasName("pk_supplier_outboxes");
+
+                    b.HasIndex("Id")
+                        .IsUnique()
+                        .HasDatabaseName("ix_supplier_outboxes_id");
+
+                    b.ToTable("supplier_outboxes", "human_resources");
                 });
 
             modelBuilder.Entity("HumanResources.Domain.Region", b =>

@@ -1,5 +1,5 @@
 ﻿namespace HumanResources.Domain.OutBox;
 
-public class ProductOutbox : Outbox
+public class ShipperOutbox : Outbox
 {
 }

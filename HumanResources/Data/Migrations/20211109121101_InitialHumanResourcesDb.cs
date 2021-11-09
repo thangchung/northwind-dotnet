@@ -16,6 +16,22 @@ namespace HumanResources.Data.Migrations
                 .Annotation("Npgsql:PostgresExtension:uuid-ossp", ",,");
 
             migrationBuilder.CreateTable(
+                name: "customer_outboxes",
+                schema: "human_resources",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "uuid_generate_v4()"),
+                    type = table.Column<string>(type: "text", nullable: true),
+                    aggregate_type = table.Column<string>(type: "text", nullable: true),
+                    aggregate_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    payload = table.Column<byte[]>(type: "bytea", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_customer_outboxes", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "customers",
                 schema: "human_resources",
                 columns: table => new
@@ -37,6 +53,22 @@ namespace HumanResources.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("pk_customers", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "employee_outboxes",
+                schema: "human_resources",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "uuid_generate_v4()"),
+                    type = table.Column<string>(type: "text", nullable: true),
+                    aggregate_type = table.Column<string>(type: "text", nullable: true),
+                    aggregate_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    payload = table.Column<byte[]>(type: "bytea", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_employee_outboxes", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -93,6 +125,22 @@ namespace HumanResources.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "shipper_outboxes",
+                schema: "human_resources",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "uuid_generate_v4()"),
+                    type = table.Column<string>(type: "text", nullable: true),
+                    aggregate_type = table.Column<string>(type: "text", nullable: true),
+                    aggregate_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    payload = table.Column<byte[]>(type: "bytea", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_shipper_outboxes", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "shippers",
                 schema: "human_resources",
                 columns: table => new
@@ -106,6 +154,22 @@ namespace HumanResources.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("pk_shippers", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "supplier_outboxes",
+                schema: "human_resources",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "uuid_generate_v4()"),
+                    type = table.Column<string>(type: "text", nullable: true),
+                    aggregate_type = table.Column<string>(type: "text", nullable: true),
+                    aggregate_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    payload = table.Column<byte[]>(type: "bytea", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_supplier_outboxes", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -184,9 +248,23 @@ namespace HumanResources.Data.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "ix_customer_outboxes_id",
+                schema: "human_resources",
+                table: "customer_outboxes",
+                column: "id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "ix_customers_id",
                 schema: "human_resources",
                 table: "customers",
+                column: "id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_employee_outboxes_id",
+                schema: "human_resources",
+                table: "employee_outboxes",
                 column: "id",
                 unique: true);
 
@@ -217,9 +295,23 @@ namespace HumanResources.Data.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "ix_shipper_outboxes_id",
+                schema: "human_resources",
+                table: "shipper_outboxes",
+                column: "id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "ix_shippers_id",
                 schema: "human_resources",
                 table: "shippers",
+                column: "id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_supplier_outboxes_id",
+                schema: "human_resources",
+                table: "supplier_outboxes",
                 column: "id",
                 unique: true);
 
@@ -247,7 +339,15 @@ namespace HumanResources.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "customer_outboxes",
+                schema: "human_resources");
+
+            migrationBuilder.DropTable(
                 name: "customers",
+                schema: "human_resources");
+
+            migrationBuilder.DropTable(
+                name: "employee_outboxes",
                 schema: "human_resources");
 
             migrationBuilder.DropTable(
@@ -255,7 +355,15 @@ namespace HumanResources.Data.Migrations
                 schema: "human_resources");
 
             migrationBuilder.DropTable(
+                name: "shipper_outboxes",
+                schema: "human_resources");
+
+            migrationBuilder.DropTable(
                 name: "shippers",
+                schema: "human_resources");
+
+            migrationBuilder.DropTable(
+                name: "supplier_outboxes",
                 schema: "human_resources");
 
             migrationBuilder.DropTable(

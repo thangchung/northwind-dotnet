@@ -1,4 +1,5 @@
 using HumanResources.Domain;
+using HumanResources.Domain.OutBox;
 
 namespace HumanResources.Data;
 
@@ -107,6 +108,43 @@ public class MainDbContext : AppDbContextBase
 
         modelBuilder.Entity<Supplier>()
             .OwnsOne(x => x.AddressInfo);
+
+        // outbox
+        modelBuilder.Entity<SupplierOutbox>().ToTable("supplier_outboxes", Schema);
+        modelBuilder.Entity<SupplierOutbox>().HasKey(x => x.Id);
+        modelBuilder.Entity<SupplierOutbox>().Property(x => x.Id).HasColumnType("uuid")
+            .HasDefaultValueSql(Consts.UuidAlgorithm);
+
+        modelBuilder.Entity<SupplierOutbox>().HasIndex(x => x.Id).IsUnique();
+        modelBuilder.Entity<SupplierOutbox>().Ignore(x => x.Updated);
+        modelBuilder.Entity<SupplierOutbox>().Ignore(x => x.DomainEvents);
+
+        modelBuilder.Entity<CustomerOutbox>().ToTable("customer_outboxes", Schema);
+        modelBuilder.Entity<CustomerOutbox>().HasKey(x => x.Id);
+        modelBuilder.Entity<CustomerOutbox>().Property(x => x.Id).HasColumnType("uuid")
+            .HasDefaultValueSql(Consts.UuidAlgorithm);
+
+        modelBuilder.Entity<CustomerOutbox>().HasIndex(x => x.Id).IsUnique();
+        modelBuilder.Entity<CustomerOutbox>().Ignore(x => x.Updated);
+        modelBuilder.Entity<CustomerOutbox>().Ignore(x => x.DomainEvents);
+
+        modelBuilder.Entity<EmployeeOutbox>().ToTable("employee_outboxes", Schema);
+        modelBuilder.Entity<EmployeeOutbox>().HasKey(x => x.Id);
+        modelBuilder.Entity<EmployeeOutbox>().Property(x => x.Id).HasColumnType("uuid")
+            .HasDefaultValueSql(Consts.UuidAlgorithm);
+
+        modelBuilder.Entity<EmployeeOutbox>().HasIndex(x => x.Id).IsUnique();
+        modelBuilder.Entity<EmployeeOutbox>().Ignore(x => x.Updated);
+        modelBuilder.Entity<EmployeeOutbox>().Ignore(x => x.DomainEvents);
+
+        modelBuilder.Entity<ShipperOutbox>().ToTable("shipper_outboxes", Schema);
+        modelBuilder.Entity<ShipperOutbox>().HasKey(x => x.Id);
+        modelBuilder.Entity<ShipperOutbox>().Property(x => x.Id).HasColumnType("uuid")
+            .HasDefaultValueSql(Consts.UuidAlgorithm);
+
+        modelBuilder.Entity<ShipperOutbox>().HasIndex(x => x.Id).IsUnique();
+        modelBuilder.Entity<ShipperOutbox>().Ignore(x => x.Updated);
+        modelBuilder.Entity<ShipperOutbox>().Ignore(x => x.DomainEvents);
     }
 }
 

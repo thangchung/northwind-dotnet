@@ -4,6 +4,12 @@ public class Employee : EntityRootBase
 {
     private Employee() {}
 
+    public Employee(string firstName, string lastName)
+    {
+        FirstName = firstName;
+        LastName = lastName;
+    }
+
     public string LastName { get; private set; } = default!;
     public string FirstName { get; private set; } = default!;
     public string? Title { get; private set; } = default!;

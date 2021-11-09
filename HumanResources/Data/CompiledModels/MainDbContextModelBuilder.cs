@@ -18,6 +18,10 @@ namespace HumanResources
             var addressInfo = AddressInfoEntityType.Create(this);
             var employee = EmployeeEntityType.Create(this);
             var addressInfo0 = AddressInfo0EntityType.Create(this);
+            var customerOutbox = CustomerOutboxEntityType.Create(this);
+            var employeeOutbox = EmployeeOutboxEntityType.Create(this);
+            var shipperOutbox = ShipperOutboxEntityType.Create(this);
+            var supplierOutbox = SupplierOutboxEntityType.Create(this);
             var region = RegionEntityType.Create(this);
             var shipper = ShipperEntityType.Create(this);
             var supplier = SupplierEntityType.Create(this);
@@ -40,6 +44,10 @@ namespace HumanResources
             AddressInfoEntityType.CreateAnnotations(addressInfo);
             EmployeeEntityType.CreateAnnotations(employee);
             AddressInfo0EntityType.CreateAnnotations(addressInfo0);
+            CustomerOutboxEntityType.CreateAnnotations(customerOutbox);
+            EmployeeOutboxEntityType.CreateAnnotations(employeeOutbox);
+            ShipperOutboxEntityType.CreateAnnotations(shipperOutbox);
+            SupplierOutboxEntityType.CreateAnnotations(supplierOutbox);
             RegionEntityType.CreateAnnotations(region);
             ShipperEntityType.CreateAnnotations(shipper);
             SupplierEntityType.CreateAnnotations(supplier);

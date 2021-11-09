@@ -1,34 +1,19 @@
+using HumanResources;
 using HumanResources.Data;
 using HumanResources.Domain;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddCustomCors();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddCustomMediatR(new[] { typeof(Employee) });
-builder.Services.AddCustomValidators(new[] { typeof(Employee) });
-
-builder.Services.AddPostgresDbContext<MainDbContext>(
-        builder.Configuration.GetConnectionString("postgres"),
-        options => options.UseModel(HumanResources.MainDbContextModel.Instance),
-        svc => svc.AddRepository(typeof(Repository<>)))
-    .AddDatabaseDeveloperPageExceptionFilter();
-
-builder.Services.AddDaprClient();
-builder.Services.AddSwaggerGen();
-
-builder.Services.AddSchemeRedistry();
-
-builder.Services.AddKafkaConsumer(o =>
-{
-    o.Topic = "human_resources_events";
-    o.GroupId = "human_resources_events_group";
-    /*o.EventResolver = async (eventFullName, bytes, schemaRegistryClient) =>
-    {
-        return result;
-    };*/
-});
+builder.Services
+    .AddCustomCors()
+    .AddHttpContextAccessor()
+    .AddEndpointsApiExplorer()
+    .AddCustomMediatR(new[] { typeof(Employee) })
+    .AddCustomValidators(new[] { typeof(Employee) })
+    .AddPersistence(builder.Configuration)
+    .AddSwaggerGen()
+    .AddSchemeRedistry()
+    .AddDaprClient();
 
 var app = builder.Build();
 
@@ -49,3 +34,6 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 await app.DoDbMigrationAsync(app.Logger);
+await app.DoSeedData(app.Logger);
+
+app.Run();

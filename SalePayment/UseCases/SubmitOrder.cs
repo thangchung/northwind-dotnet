@@ -64,11 +64,6 @@ public class SubmitOrder
                     return Results.BadRequest(rejectedModel);
                 }
 
-                // todo: gRPC check
-                // validation customer_id, employee_id using gRPC
-                // check order date should greater than today
-                // ...
-
                 /* start to persistence data and send it to outbox */
                 var newOrder = await _orderRepository.AddAsync(request, cancellationToken);
 
