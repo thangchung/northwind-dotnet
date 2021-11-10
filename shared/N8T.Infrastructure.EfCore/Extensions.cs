@@ -89,6 +89,7 @@ namespace N8T.Infrastructure.EfCore
             {
                 if (!await dbFacadeResolver?.Database.CanConnectAsync()!)
                 {
+                    Console.WriteLine($"Connection String: {dbFacadeResolver?.Database.GetConnectionString()}");
                     throw new Exception("Couldn't connect database.");
                 }
 
@@ -104,7 +105,7 @@ namespace N8T.Infrastructure.EfCore
             {
                 return Policy.Handle<Exception>().WaitAndRetryAsync(
                     retries,
-                    retry => TimeSpan.FromSeconds(5),
+                    retry => TimeSpan.FromSeconds(15),
                     (exception, timeSpan, retry, ctx) =>
                     {
                         logger.LogWarning(exception,

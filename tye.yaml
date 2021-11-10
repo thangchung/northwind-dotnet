@@ -19,7 +19,7 @@ services:
     - inf
 
 - name: redis-cli
-  image: redis
+  image: redis:6.2.5-alpine
   args: "redis-cli -h redis MONITOR"
   tags:
     - inf
@@ -81,7 +81,6 @@ services:
     - inf
 
 - name: connector
-  # dockerFile: _build/debezium/Dockerfile
   image: debezium/connect:1.7
   env:
     - BOOTSTRAP_SERVERS=kafka:9092
@@ -122,17 +121,6 @@ services:
   tags:
     - inf
 
-- name: rabbitmq
-  image: masstransit/rabbitmq:latest
-  bindings:
-    - name: "5672"
-      containerPort: 5672
-      port: 5672
-    - name: http15672
-      protocol: http
-      containerPort: 15672
-      port: 15672
-
 - name: mongo
   image: mongo
   bindings:
@@ -143,36 +131,29 @@ services:
     - name: "27019"
       containerPort: 27019
       port: 27019
+  tags:
+    - inf
 
-# - name: humanresourcesapp
-#   project: HumanResources/HumanResources.csproj
-#   env_file:
-#     - .env
-#   env:
-#   - name: ConnectionStrings__postgres
-#     value: Server=postgres;Port=5432;Database=${env:POSTGRES_DB};User Id=${env:POSTGRES_USER};Password=${env:POSTGRES_PASSWORD};
-#   bindings:
-#   - port: 5001
+- name: humanresourcesapp
+  project: HumanResources/HumanResources.csproj
+  env_file:
+    - .env
+  bindings:
+  - port: 5001
 
-# - name: productcatalogapp
-#   project: ProductCatalog/ProductCatalog.csproj
-#   env_file:
-#     - .env
-#   env:
-#   - name: ConnectionStrings__postgres
-#     value: Server=postgres;Port=5432;Database=${env:POSTGRES_DB};User Id=${env:POSTGRES_USER};Password=${env:POSTGRES_PASSWORD};
-#   bindings:
-#   - port: 5002
+- name: productcatalogapp
+  project: ProductCatalog/ProductCatalog.csproj
+  env_file:
+    - .env
+  bindings:
+  - port: 5002
 
-# - name: salepaymentapp
-#   project: SalePayment/SalePayment.csproj
-#   env_file:
-#     - .env
-#   env:
-#   - name: ConnectionStrings__postgres
-#     value: Server=postgres;Port=5432;Database=${env:POSTGRES_DB};User Id=${env:POSTGRES_USER};Password=${env:POSTGRES_PASSWORD};
-#   bindings:
-#   - port: 5003
+- name: salepaymentapp
+  project: SalePayment/SalePayment.csproj
+  env_file:
+    - .env
+  bindings:
+    - port: 5003
 
 # - name: shippingapp
 #   project: Shipping/Shipping.csproj
@@ -194,20 +175,20 @@ services:
 #   bindings:
 #   - port: 5005
 
-- name: auditcenterapp
-  project: AuditCenter/AuditCenter.csproj
-  env_file:
-    - .env
-  bindings:
-  - protocol: https
-    containerPort: 5006
-    port: 5006
+# - name: auditcenterapp
+#   project: AuditCenter/AuditCenter.csproj
+#   env_file:
+#     - .env
+#   bindings:
+#   - protocol: https
+#     containerPort: 5006
+#     port: 5006
 
-- name: gatewayapp
-  project: AppGateway/AppGateway.csproj
-  env_file:
-    - .env
-  bindings:
-  - protocol: http
-    containerPort: 5010
-    port: 5010
+# - name: gatewayapp
+#   project: AppGateway/AppGateway.csproj
+#   env_file:
+#     - .env
+#   bindings:
+#   - protocol: http
+#     containerPort: 5010
+#     port: 5010

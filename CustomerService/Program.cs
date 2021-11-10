@@ -11,7 +11,7 @@ builder.Services.AddCustomMediatR(new[] { typeof(CustomerDemographic) });
 builder.Services.AddCustomValidators(new[] { typeof(CustomerDemographic) });
 
 builder.Services.AddPostgresDbContext<MainDbContext>(
-        builder.Configuration.GetConnectionString("postgres"),
+        builder.Configuration.GetConnectionString("northwind_db"),
         options => options.UseModel(CustomerService.MainDbContextModel.Instance),
         svc => svc.AddRepository(typeof(Repository<>)))
     .AddDatabaseDeveloperPageExceptionFilter();

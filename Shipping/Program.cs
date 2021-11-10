@@ -10,7 +10,7 @@ builder.Services.AddCustomMediatR(new[] { typeof(ShippingOrder) });
 builder.Services.AddCustomValidators(new[] { typeof(ShippingOrder) });
 
 builder.Services.AddPostgresDbContext<MainDbContext>(
-        builder.Configuration.GetConnectionString("postgres"),
+        builder.Configuration.GetConnectionString("northwind_db"),
         options => options.UseModel(Shipping.MainDbContextModel.Instance),
         svc => svc.AddRepository(typeof(Repository<>)))
     .AddDatabaseDeveloperPageExceptionFilter();

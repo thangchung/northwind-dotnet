@@ -12,7 +12,7 @@ builder.Services
     .AddCustomValidators(new[] { typeof(Employee) })
     .AddPersistence(builder.Configuration)
     .AddSwaggerGen()
-    .AddSchemeRedistry()
+    .AddSchemeRedistry(builder.Configuration.GetValue<string>("Kafka:SchemaRegistryUrl"))
     .AddDaprClient();
 
 var app = builder.Build();
