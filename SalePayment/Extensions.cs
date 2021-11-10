@@ -1,4 +1,5 @@
-﻿using SalePayment.Consumers.MassTransit;
+﻿using Northwind.IntegrationEvents.Protobuf.Audit.V1;
+using SalePayment.Consumers.MassTransit;
 using SalePayment.Data;
 using SalePayment.Data.Repository;
 using SalePayment.StateMachines;
@@ -19,6 +20,22 @@ public static class Extensions
             .AddDatabaseDeveloperPageExceptionFilter();
 
         services.AddScoped<IOrderRepository, OrderRepository>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddGrpcClients(this IServiceCollection services, IConfiguration config)
+    {
+        services.AddGrpcClient<Auditor.AuditorClient>("Auditor", o =>
+            {
+                o.Address = new Uri(config.GetValue<string>("AuditorGrpcUrl"));
+            })
+            /*.ConfigureHttpClient(client =>
+            {
+                //client.DefaultRequestVersion = HttpVersion.Version30;
+                //client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact;
+            })*/
+            .EnableCallContextPropagation(o => o.SuppressContextNotFoundErrors = true);
 
         return services;
     }

@@ -22,6 +22,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Grpc.AspNetCore" Version="2.40.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,6 +33,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Protobuf Include="..\shared\Northwind.IntegrationEvents\proto\northwind\audit\v1\audit.proto" Link="Protos\audit.proto" AdditionalImportDirs="..\shared\Northwind.IntegrationEvents\proto\" />
+    <Protobuf Include="..\shared\Northwind.IntegrationEvents\proto\northwind\audit\v1\audit_api.proto" Link="Protos\audit_api.proto" AdditionalImportDirs="..\shared\Northwind.IntegrationEvents\proto\" GrpcServices="Client" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Microsoft.AspNetCore.Mvc" />
     <Using Include="Microsoft.EntityFrameworkCore" />
     <Using Include="System.Collections.ObjectModel" />
     <Using Include="MediatR" />

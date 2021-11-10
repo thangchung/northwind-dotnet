@@ -1,11 +1,11 @@
-@host = http://localhost:5003
+@host = http://localhost:5010
 
 ###
-GET {{host}}/v1/api/order-state-machine HTTP/1.1
+GET {{host}}/sale-api/v1/order-state-machine HTTP/1.1
 content-type: application/json
 
 ###
-POST {{host}}/v1/api/order HTTP/1.1
+POST {{host}}/sale-api/v1/order HTTP/1.1
 content-type: application/json
 
 {
@@ -25,12 +25,10 @@ content-type: application/json
 # todo: provide ship information
 
 ###
-@orderId = 5934aac6-c52a-4aaa-9243-742bcc24126c
-# GET {{host}}/v1/api/order/{{orderId}}/status HTTP/1.1
-# content-type: application/json
+@orderId = edb29b6d-eb7a-4028-932d-e8b43bfe6767
 
 ###
-POST {{host}}/v1/api/payment HTTP/1.1
+POST {{host}}/sale-api/v1/payment HTTP/1.1
 content-type: application/json
 
 {
@@ -41,7 +39,7 @@ content-type: application/json
 }
 
 ###
-POST {{host}}/v1/api/shipment/{{orderId}}/pick HTTP/1.1
+POST {{host}}/sale-api/v1/shipment/{{orderId}}/pick HTTP/1.1
 content-type: application/json
 
 {
@@ -52,12 +50,12 @@ content-type: application/json
 }
 
 ###
-POST {{host}}/v1/api/shipment/{{orderId}}/delivery HTTP/1.1
+POST {{host}}/sale-api/v1/shipment/{{orderId}}/delivery HTTP/1.1
 content-type: application/json
 
 {
     "orderId": "{{orderId}}",
     "shipperId": "008765f8-3e46-4491-b3b4-c22fe1da9968",
     "customerId": "008765f8-3e46-4491-b3b4-c22fe1da9968",
-    "beFailedAt": "Delivered1"
+    "beFailedAt": "DELIVERED1"
 }

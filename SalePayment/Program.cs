@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using SalePayment;
 using SalePayment.Data;
 using SalePayment.Domain;
@@ -17,6 +15,7 @@ builder.Services
     .AddSwaggerGen()
     .AddCdCConsumers()
     .AddMassTransit()
+    .AddGrpcClients(builder.Configuration)
     .AddDaprClient();
 
 var app = builder.Build();
@@ -40,27 +39,27 @@ app.UseSwaggerUI();
 await app.DoDbMigrationAsync(app.Logger);
 await app.DoSeedData(app.Logger);
 
-app.MapPost("/v1/api/order",
+app.MapPost("/api/v1/order",
     async ([FromBody] SubmitOrder.Command model, ISender sender) => await sender.Send(model));
 
-app.MapPost("/v1/api/payment",
+app.MapPost("/api/v1/payment",
     async (ProcessPayment.Command model, ISender sender) => await sender.Send(model));
 
-app.MapPost("/v1/api/shipment/{orderId}/pick",
+app.MapPost("/api/v1/shipment/{orderId}/pick",
     async (Guid orderId, PickShipment.Command model, ISender sender) =>
     {
         model.OrderId = orderId;
         return await sender.Send(model);
     });
 
-app.MapPost("/v1/api/shipment/{orderId}/delivery",
+app.MapPost("/api/v1/shipment/{orderId}/delivery",
     async (Guid orderId, DeliverShipment.Command model, ISender sender) =>
     {
         model.OrderId = orderId;
         return await sender.Send(model);
     });
 
-app.MapGet("/v1/api/order-state-machine",
+app.MapGet("/api/v1/order-state-machine",
     (ISender sender) => sender.Send(new GetOrderStateMachine.Query()));
 
 app.Run();

@@ -1,12 +1,12 @@
-@host = http://localhost:5002
+@host = http://localhost:5010
 
 ###
-GET {{host}}/api/v1/products HTTP/1.1
+GET {{host}}/product-api/v1/products HTTP/1.1
 content-type: application/json
 x-query: {"filters":[],"sorts":["NameDesc"]}
 
 ###
-POST {{host}}/api/v1/products HTTP/1.1
+POST {{host}}/product-api/v1/products HTTP/1.1
 content-type: application/json
 
 {
@@ -15,7 +15,7 @@ content-type: application/json
 
 ###
 @productUpdateId = b528123b-9bd8-4583-b778-d73a6cc7b81a
-PUT {{host}}/api/v1/products/{{productUpdateId}} HTTP/1.1
+PUT {{host}}/product-api/v1/products/{{productUpdateId}} HTTP/1.1
 content-type: application/json
 
 {
@@ -24,5 +24,5 @@ content-type: application/json
 
 ###
 @productDeleteId = b528123b-9bd8-4583-b778-d73a6cc7b81a
-DELETE  {{host}}/api/v1/products/{{productDeleteId}} HTTP/1.1
+DELETE  {{host}}/product-api/v1/products/{{productDeleteId}} HTTP/1.1
 content-type: application/json

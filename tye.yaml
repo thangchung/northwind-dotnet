@@ -193,3 +193,21 @@ services:
 #     value: Server=postgres;Port=5432;Database=${env:POSTGRES_DB};User Id=${env:POSTGRES_USER};Password=${env:POSTGRES_PASSWORD};
 #   bindings:
 #   - port: 5005
+
+- name: auditcenterapp
+  project: AuditCenter/AuditCenter.csproj
+  env_file:
+    - .env
+  bindings:
+  - protocol: https
+    containerPort: 5006
+    port: 5006
+
+- name: gatewayapp
+  project: AppGateway/AppGateway.csproj
+  env_file:
+    - .env
+  bindings:
+  - protocol: http
+    containerPort: 5010
+    port: 5010

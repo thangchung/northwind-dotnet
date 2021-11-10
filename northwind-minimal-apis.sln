@@ -22,6 +22,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalePayment", "SalePayment\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shipping", "Shipping\Shipping.csproj", "{0B52A400-C80D-4320-8AA1-A70F12102DFD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuditCenter", "AuditCenter\AuditCenter.csproj", "{B5171379-6F7F-46F2-8DC6-05608CFCBF5B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppGateway", "AppGateway\AppGateway.csproj", "{1DCD41F0-8D79-44EA-B980-E77DFF8EF51F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,6 +68,14 @@ Global
 		{0B52A400-C80D-4320-8AA1-A70F12102DFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0B52A400-C80D-4320-8AA1-A70F12102DFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0B52A400-C80D-4320-8AA1-A70F12102DFD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5171379-6F7F-46F2-8DC6-05608CFCBF5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5171379-6F7F-46F2-8DC6-05608CFCBF5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5171379-6F7F-46F2-8DC6-05608CFCBF5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5171379-6F7F-46F2-8DC6-05608CFCBF5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1DCD41F0-8D79-44EA-B980-E77DFF8EF51F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DCD41F0-8D79-44EA-B980-E77DFF8EF51F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DCD41F0-8D79-44EA-B980-E77DFF8EF51F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DCD41F0-8D79-44EA-B980-E77DFF8EF51F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{6A9D038D-268D-4939-BE3A-0C9F3DF81191} = {DA15C935-9581-49A7-B21B-8F501D933962}

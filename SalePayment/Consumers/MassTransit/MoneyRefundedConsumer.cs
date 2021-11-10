@@ -1,14 +1,20 @@
-﻿namespace SalePayment.Consumers.MassTransit;
+﻿using Grpc.Net.ClientFactory;
+using Northwind.IntegrationEvents.Protobuf.Audit.V1;
+
+namespace SalePayment.Consumers.MassTransit;
 
 public class MoneyRefundedConsumer : IConsumer<MoneyRefunded>
 {
     private readonly ITopicProducer<OrderCancelled> _orderCancelledTopicProducer;
+    private readonly GrpcClientFactory _grpcClientFactory;
     private readonly ILogger<MoneyRefundedConsumer> _logger;
 
     public MoneyRefundedConsumer(ITopicProducer<OrderCancelled> orderCancelledTopicProducer,
+        GrpcClientFactory grpcClientFactory,
         ILogger<MoneyRefundedConsumer> logger)
     {
         _orderCancelledTopicProducer = orderCancelledTopicProducer;
+        _grpcClientFactory = grpcClientFactory;
         _logger = logger;
     }
 
@@ -19,6 +25,16 @@ public class MoneyRefundedConsumer : IConsumer<MoneyRefunded>
 
         // todo: compensation data
         // todo: submit claim money to payment gateway based on transaction_id
+
+        var auditorClient = _grpcClientFactory.CreateClient<Auditor.AuditorClient>("Auditor");
+        await auditorClient.SubmitAuditAsync(new SubmitAuditRequest
+        {
+            Actor = "[order-state-machine]",
+            Event = nameof(MoneyRefunded),
+            Status = "Refunded",
+            AuditedAt = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(DateTime.UtcNow),
+            CorrelateId = context.CorrelationId.ToString()
+        });
 
         await _orderCancelledTopicProducer.Produce(new
         {

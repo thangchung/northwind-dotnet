@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package northwind.audit.v1;
+
+option csharp_namespace = "Northwind.IntegrationEvents.Protobuf.Audit.V1";
+
+import "audit.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+service Auditor {
+    rpc Ping (google.protobuf.Empty) returns (google.protobuf.Empty) {};
+    rpc SubmitAudit(SubmitAuditRequest) returns (SubmitAuditResponse) {};
+}
+
+message SubmitAuditRequest {
+    string correlate_id = 1;
+    string event = 2;
+    string status = 3;
+    string actor = 4;
+    google.protobuf.Timestamp audited_at = 5;
+    google.protobuf.StringValue description = 6;
+}
+
+message SubmitAuditResponse {
+    bool done = 1;
+}
+

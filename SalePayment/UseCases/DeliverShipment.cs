@@ -48,7 +48,7 @@ public class DeliverShipment
             public async Task<IResult> Handle(Command request, CancellationToken cancellationToken)
             {
                 // for testing only
-                if (request.BeFailedAt == "DELIVERED")
+                if (request.BeFailedAt.ToUpper() == "DELIVERED")
                 {
                     await _shipmentDeliveredFailedTopicProducer.Produce(new {request.OrderId}, cancellationToken);
                     await _shipmentCancelledTopicProducer.Produce(new {request.OrderId}, cancellationToken);
