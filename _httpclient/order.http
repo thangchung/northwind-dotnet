@@ -25,7 +25,7 @@ content-type: application/json
 # todo: provide ship information
 
 ###
-@orderId = 8b1c8559-7493-4a66-9bd5-2ec4a75ec33c
+@orderId = c5767996-14c4-4e33-800e-05e3f6c3df90
 
 ###
 POST {{host}}/sale-api/v1/payment HTTP/1.1
