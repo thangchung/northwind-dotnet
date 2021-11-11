@@ -103,6 +103,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                 .TransitionTo(OrderCancelledState));
 
         During(PaymentProcessedState,
+            Ignore(OrderSubmitted),
             Ignore(OrderValidated),
             When(PaymentProcessed)
                 .ThenAsync(async context =>

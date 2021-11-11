@@ -23,5 +23,11 @@ And now you are ready to start it
 > tye run --watch
 ```
 
+# HTTP/3 with gRPC
+- https://github.com/grpc/grpc-dotnet/issues/1478
+- https://devblogs.microsoft.com/dotnet/http-3-support-in-dotnet-6/
+- https://devblogs.microsoft.com/dotnet/net-5-new-networking-improvements/
+- https://docs.microsoft.com/en-us/dotnet/core/extensions/httpclient-http3#using-httpclient
+
 # Reference stuffs
 - https://minimal-apis.github.io/

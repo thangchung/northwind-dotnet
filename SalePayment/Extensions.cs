@@ -1,4 +1,5 @@
-﻿using Northwind.IntegrationEvents.Protobuf.Audit.V1;
+﻿using System.Net;
+using Northwind.IntegrationEvents.Protobuf.Audit.V1;
 using SalePayment.Consumers.MassTransit;
 using SalePayment.Data;
 using SalePayment.Data.Repository;
@@ -24,17 +25,33 @@ public static class Extensions
         return services;
     }
 
+    private class Http3Handler : DelegatingHandler
+    {
+        public Http3Handler(HttpMessageHandler innerHandler)
+            : base(innerHandler)
+        {
+        }
+
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            request.Version = HttpVersion.Version30;
+            request.VersionPolicy = HttpVersionPolicy.RequestVersionExact;
+            return base.SendAsync(request, cancellationToken);
+        }
+    }
+
     public static IServiceCollection AddGrpcClients(this IServiceCollection services, IConfiguration config)
     {
-        services.AddGrpcClient<Auditor.AuditorClient>("Auditor", o =>
+        services
+            .AddGrpcClient<Auditor.AuditorClient>("Auditor", o =>
             {
                 o.Address = new Uri(config.GetValue<string>("AuditorGrpcUrl"));
             })
-            /*.ConfigureHttpClient(client =>
+            .ConfigureChannel(options =>
             {
-                //client.DefaultRequestVersion = HttpVersion.Version30;
-                //client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact;
-            })*/
+                options.HttpHandler = new Http3Handler(new HttpClientHandler());
+            })
             .EnableCallContextPropagation(o => o.SuppressContextNotFoundErrors = true);
 
         return services;
