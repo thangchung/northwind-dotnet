@@ -1,64 +1,21 @@
-using Shipping.Data;
+using Shipping;
 using Shipping.Domain;
+using Shipping.UseCases;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddCustomCors();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddCustomMediatR(new[] { typeof(ShippingOrder) });
-builder.Services.AddCustomValidators(new[] { typeof(ShippingOrder) });
-
-builder.Services.AddPostgresDbContext<MainDbContext>(
-        builder.Configuration.GetConnectionString("northwind_db"),
-        options => options.UseModel(Shipping.MainDbContextModel.Instance),
-        svc => svc.AddRepository(typeof(Repository<>)))
-    .AddDatabaseDeveloperPageExceptionFilter();
-
-builder.Services.AddDaprClient();
-builder.Services.AddSwaggerGen();
-
-builder.Services.AddSchemeRedistry();
-
-builder.Services.AddKafkaConsumer(o =>
-{
-    o.Topic = "shippers_cdc_events";
-    o.GroupId = "shippers_cdc_events_group";
-    o.EventResolver = async (eventFullName, bytes, schemaRegistryClient) =>
-    {
-        ISpecificRecord? result = null;
-        if (eventFullName == typeof(ShipperCreated).FullName)
-        {
-            result = await bytes.DeserializeAsync<ShipperCreated>(schemaRegistryClient);
-        }
-        else if (eventFullName == typeof(ShipperUpdated).FullName)
-        {
-            result = await bytes.DeserializeAsync<ShipperUpdated>(schemaRegistryClient);
-        }
-        else if (eventFullName == typeof(ShipperDeleted).FullName)
-        {
-            result = await bytes.DeserializeAsync<ShipperDeleted>(schemaRegistryClient);
-        }
-
-        return result;
-    };
-});
-
-builder.Services.AddKafkaConsumer(o =>
-{
-    o.Topic = "order_cdc_events";
-    o.GroupId = "order_cdc_events_group";
-    o.EventResolver = async (eventFullName, bytes, schemaRegistryClient) =>
-    {
-        ISpecificRecord? result = null;
-        if (eventFullName == typeof(OrderCreated).FullName)
-        {
-            result = await bytes.DeserializeAsync<OrderCreated>(schemaRegistryClient);
-        }
-
-        return result;
-    };
-});
+builder.Services
+    .AddCustomCors()
+    .AddHttpContextAccessor()
+    .AddEndpointsApiExplorer()
+    .AddCustomMediatR(new[] { typeof(ShippingOrder) })
+    .AddCustomValidators(new[] { typeof(ShippingOrder) })
+    .AddPersistence("northwind_db", builder.Configuration)
+    .AddSchemeRegistry(builder.Configuration)
+    .AddCdCConsumers()
+    .AddCustomMassTransit(builder.Configuration)
+    .AddSwaggerGen()
+    .AddDaprClient();
 
 var app = builder.Build();
 
@@ -79,5 +36,15 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 await app.DoDbMigrationAsync(app.Logger);
+
+app.MapPost("/api/v1/shipment/{orderId}/pick",
+    async (Guid orderId, PickShipmentCommand model, ISender sender) =>
+        await sender.Send(model with {OrderId = orderId}));
+
+app.MapPost("/api/v1/shipment/{orderId}/delivery",
+    async (Guid orderId, DeliverShipmentCommand model, ISender sender) =>
+        await sender.Send(model with {OrderId = orderId}));
+
+app.MapFallback(() => Results.Redirect("/swagger"));
 
 app.Run();

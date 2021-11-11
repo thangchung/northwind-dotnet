@@ -5,7 +5,7 @@ namespace SalePayment.Data.Repository;
 
 public interface IOrderRepository
 {
-    Task<Order> AddAsync(SubmitOrder.Command orderCommand, CancellationToken cancellationToken = default);
+    Task<Order> AddAsync(SubmitOrderCommand orderCommand, CancellationToken cancellationToken = default);
 }
 
 internal class OrderRepository : RepositoryBase<MainDbContext, Order>, IOrderRepository
@@ -14,7 +14,7 @@ internal class OrderRepository : RepositoryBase<MainDbContext, Order>, IOrderRep
     {
     }
 
-    public async Task<Order> AddAsync(SubmitOrder.Command orderCommand, CancellationToken cancellationToken = default)
+    public async Task<Order> AddAsync(SubmitOrderCommand orderCommand, CancellationToken cancellationToken = default)
     {
         var customer = await DbContext.Set<CustomerInfo>()
             .FirstOrDefaultAsync(x => x.CustomerId == orderCommand.CustomerId, cancellationToken: cancellationToken);

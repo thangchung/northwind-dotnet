@@ -4,6 +4,7 @@ using Avro.Specific;
 using Confluent.Kafka;
 using Confluent.SchemaRegistry;
 using Confluent.SchemaRegistry.Serdes;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace N8T.Infrastructure.SchemaRegistry
@@ -38,8 +39,9 @@ namespace N8T.Infrastructure.SchemaRegistry
 
     public static class Extensions
     {
-        public static IServiceCollection AddSchemeRedistry(this IServiceCollection services, string registryUrl = "http://localhost:8081")
+        public static IServiceCollection AddSchemeRegistry(this IServiceCollection services, IConfiguration config)
         {
+            var registryUrl = config.GetValue<string>("Kafka:SchemaRegistryUrl", "http://localhost:8081");
             services.AddSingleton<ISchemaRegistryClient>(x => new CachedSchemaRegistryClient(
                 new SchemaRegistryConfig { Url = registryUrl }));
             return services;

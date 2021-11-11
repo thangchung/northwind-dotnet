@@ -25,7 +25,7 @@ content-type: application/json
 # todo: provide ship information
 
 ###
-@orderId = edb29b6d-eb7a-4028-932d-e8b43bfe6767
+@orderId = 8b1c8559-7493-4a66-9bd5-2ec4a75ec33c
 
 ###
 POST {{host}}/sale-api/v1/payment HTTP/1.1
@@ -39,7 +39,7 @@ content-type: application/json
 }
 
 ###
-POST {{host}}/sale-api/v1/shipment/{{orderId}}/pick HTTP/1.1
+POST {{host}}/ship-api/v1/shipment/{{orderId}}/pick HTTP/1.1
 content-type: application/json
 
 {
@@ -50,7 +50,7 @@ content-type: application/json
 }
 
 ###
-POST {{host}}/sale-api/v1/shipment/{{orderId}}/delivery HTTP/1.1
+POST {{host}}/ship-api/v1/shipment/{{orderId}}/delivery HTTP/1.1
 content-type: application/json
 
 {

@@ -11,7 +11,7 @@ public class Order : EntityRootBase
     }
 
     public Guid CustomerInfoId { get; private set; }
-    public CustomerInfo CustomerInfo { get; private set; }
+    public CustomerInfo CustomerInfo { get; private set; } = null!;
     public Guid? EmployeeInfoId { get; private set; }
     public EmployeeInfo? EmployeeInfo { get; private set; }
     public DateTime OrderDate { get; private set; }

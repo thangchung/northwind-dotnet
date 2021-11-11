@@ -3,93 +3,87 @@ using SalePayment.Domain.Outbox;
 
 namespace SalePayment.UseCases;
 
-public class SubmitOrder
+public record SubmitOrderCommand : ICommand
 {
-    public record Command : ICommand
+    public Guid CustomerId { get; init; }
+    public DateTime OrderDate { get; init; }
+    public DateTime? RequiredDate { get; init; }
+    public List<OrderDetailDto> Details { get; init; } = new();
+
+    public string FailedAt { get; init; } = "NotFailed"; // only for test
+
+    public readonly record struct OrderSubmissionAccepted(Guid OrderId, Guid CustomerId);
+
+    public readonly record struct OrderSubmissionRejected(Guid OrderId, Guid CustomerId, string Reason);
+
+    public readonly record struct OrderDetailDto(Guid ProductId, decimal UnitPrice, int Quantity);
+
+    internal class Validator : AbstractValidator<SubmitOrderCommand>
     {
-        public Guid CustomerId { get; init; }
-        public DateTime OrderDate { get; init; }
-        public DateTime? RequiredDate { get; init; }
-        public List<OrderDetailDto> Details { get; init; } = new();
-
-        public string FailedAt { get; init; } = "NotFailed"; // only for test
-
-        public record OrderSubmissionAccepted(Guid OrderId, Guid CustomerId);
-        public record OrderSubmissionRejected(Guid OrderId, Guid CustomerId, string Reason);
-
-        public record struct OrderDetailDto(Guid ProductId, decimal UnitPrice, int Quantity);
-
-        internal class Validator : AbstractValidator<Command>
+        public Validator()
         {
-            public Validator()
-            {
-                RuleFor(v => v.CustomerId)
-                    .NotEmpty().WithMessage("CustomerId is required.");
+            RuleFor(v => v.CustomerId)
+                .NotEmpty().WithMessage("CustomerId is required.");
 
-                RuleFor(v => v.OrderDate)
-                    .NotEmpty().WithMessage("OrderDate is required.");
-            }
+            RuleFor(v => v.OrderDate)
+                .NotEmpty().WithMessage("OrderDate is required.");
+        }
+    }
+
+    internal class Handler : MutateHandlerBase<OrderOutbox>, IRequestHandler<SubmitOrderCommand, IResult>
+    {
+        private readonly IOrderRepository _orderRepository;
+        private readonly ITopicProducer<OrderSubmitted> _orderValidatedTopicProducer;
+        private readonly ILogger<Handler> _logger;
+
+        public Handler(IOrderRepository orderRepository,
+            IRepository<OrderOutbox> orderOutboxRepository,
+            ISchemaRegistryClient schemaRegistryClient,
+            ITopicProducer<OrderSubmitted> orderValidatedTopicProducer,
+            ILogger<Handler> logger)
+            : base(schemaRegistryClient, orderOutboxRepository)
+        {
+            _orderRepository = orderRepository;
+            _orderValidatedTopicProducer = orderValidatedTopicProducer;
+            _logger = logger;
         }
 
-        internal class Handler : MutateHandlerBase<OrderOutbox>, IRequestHandler<Command, IResult>
+        public async Task<IResult> Handle(SubmitOrderCommand request, CancellationToken cancellationToken)
         {
-            private readonly IOrderRepository _orderRepository;
-            private readonly ITopicProducer<OrderSubmitted> _orderValidatedTopicProducer;
-            private readonly ILogger<Handler> _logger;
+            _logger.Log(LogLevel.Debug, "SubmitOrderHandler: {CustomerId}", request.CustomerId);
 
-            public Handler(IOrderRepository orderRepository,
-                IRepository<OrderOutbox> orderOutboxRepository,
-                ISchemaRegistryClient schemaRegistryClient,
-                ITopicProducer<OrderSubmitted> orderValidatedTopicProducer,
-                ILogger<Handler> logger)
-                : base(schemaRegistryClient, orderOutboxRepository)
+            /* for testing only */
+            if (request.FailedAt.ToUpper() == "VALIDATION_FAILED")
             {
-                _orderRepository = orderRepository;
-                _orderValidatedTopicProducer = orderValidatedTopicProducer;
-                _logger = logger;
+                var rejectedModel = ResultModel<OrderSubmissionRejected>.Create(
+                    new OrderSubmissionRejected(
+                        NewGuid(),
+                        request.CustomerId,
+                        $"Test Customer cannot submit orders: {request.CustomerId}"));
+                return Results.BadRequest(rejectedModel);
             }
 
-            public async Task<IResult> Handle(Command request, CancellationToken cancellationToken)
-            {
-                _logger.Log(LogLevel.Debug, "SubmitOrderHandler: {CustomerId}", request.CustomerId);
+            /* start to persistence data and send it to outbox */
+            var newOrder = await _orderRepository.AddAsync(request, cancellationToken);
 
-                /* for testing only */
-                if (request.FailedAt.ToUpper() == "VALIDATION_FAILED")
-                {
-                    var rejectedModel = ResultModel<OrderSubmissionRejected>.Create(
-                        new OrderSubmissionRejected(
-                            NewGuid(),
-                            request.CustomerId,
-                            $"Test Customer cannot submit orders: {request.CustomerId}"));
-                    return Results.BadRequest(rejectedModel);
-                }
+            await ExportToOutbox(
+                newOrder,
+                () => (
+                    new OrderCreated {Id = newOrder.Id.ToString()},
+                    new OrderOutbox(),
+                    "order_cdc_events"
+                ),
+                cancellationToken);
+            /* end to persistence data and send it to outbox */
 
-                /* start to persistence data and send it to outbox */
-                var newOrder = await _orderRepository.AddAsync(request, cancellationToken);
+            /* trigger state machine to start processing the order */
+            await _orderValidatedTopicProducer.Produce(
+                new {OrderId = newOrder.Id, request.CustomerId, request.OrderDate, request.RequiredDate},
+                cancellationToken);
 
-                await ExportToOutbox(
-                    newOrder,
-                    () => (
-                        new OrderCreated { Id = newOrder.Id.ToString() },
-                        new OrderOutbox(),
-                        "order_cdc_events"
-                    ),
-                    cancellationToken);
-                /* end to persistence data and send it to outbox */
-
-                /* trigger state machine to start processing the order */
-                await _orderValidatedTopicProducer.Produce(new
-                {
-                    OrderId = newOrder.Id,
-                    request.CustomerId,
-                    request.OrderDate,
-                    request.RequiredDate
-                }, cancellationToken);
-
-                var acceptedModel = new OrderSubmissionAccepted(newOrder.Id, request.CustomerId);
-                var resultModel = ResultModel<OrderSubmissionAccepted>.Create(acceptedModel);
-                return Results.Ok(resultModel);
-            }
+            var acceptedModel = new OrderSubmissionAccepted(newOrder.Id, request.CustomerId);
+            var resultModel = ResultModel<OrderSubmissionAccepted>.Create(acceptedModel);
+            return Results.Ok(resultModel);
         }
     }
 }

@@ -4,6 +4,12 @@ public class Territory : EntityBase
 {
     private Territory() { }
 
+    public Territory(string description, Guid regionId)
+    {
+        Description = description;
+        RegionId = regionId;
+    }
+
     public string Description { get; private set; } = default!;
 
     public Guid RegionId { get; private set; }

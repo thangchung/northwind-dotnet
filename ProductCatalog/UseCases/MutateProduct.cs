@@ -3,7 +3,7 @@ using ProductCatalog.Domain.Outbox;
 
 namespace ProductCatalog.UseCases;
 
-public sealed class MutateProduct
+public struct MutateProduct
 {
     public record CreateCommand : ICreateCommand
     {
@@ -26,7 +26,7 @@ public sealed class MutateProduct
 
     public record UpdateCommand : IUpdateCommand<Guid>
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; init; }
         public string Name { get; set; } = default!;
 
         internal class CreateValidator : AbstractValidator<UpdateCommand>
@@ -42,8 +42,10 @@ public sealed class MutateProduct
         }
     }
 
-    public record DeleteCommand(Guid Id) : IDeleteCommand<Guid>
+    public record DeleteCommand : IDeleteCommand<Guid>
     {
+        public Guid Id { get; init; }
+
         internal class CreateValidator : AbstractValidator<DeleteCommand>
         {
             public CreateValidator()

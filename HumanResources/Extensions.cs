@@ -4,10 +4,10 @@ namespace HumanResources;
 
 public static class Extensions
 {
-    public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration config)
+    public static IServiceCollection AddPersistence(this IServiceCollection services, string connStringKey, IConfiguration config)
     {
         services.AddPostgresDbContext<MainDbContext>(
-                config.GetConnectionString("northwind_db"),
+                config.GetConnectionString(connStringKey),
                 options => options.UseModel(HumanResources.MainDbContextModel.Instance),
                 svc => svc.AddRepository(typeof(Repository<>)))
             .AddDatabaseDeveloperPageExceptionFilter();

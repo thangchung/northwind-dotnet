@@ -103,7 +103,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                 .TransitionTo(OrderCancelledState));
 
         During(PaymentProcessedState,
-            /*Ignore(OrderValidated), Ignore(OrderValidatedFailed),*/
+            Ignore(OrderValidated),
             When(PaymentProcessed)
                 .ThenAsync(async context =>
                 {
@@ -140,7 +140,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
 
         /* start shipping part */
         During(ShipmentPreparedState,
-            Ignore(OrderValidated), Ignore(PaymentProcessed), Ignore(ShipmentPrepared),
+            Ignore(ShipmentPrepared),
             When(ShipmentDispatched)
                 .ThenAsync(async context =>
                 {
@@ -174,6 +174,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                 .TransitionTo(ShipmentCancelledState));
 
         During(ShipmentCancelledState,
+            Ignore(OrderValidatedFailed),
             Ignore(ShipmentDispatchedFailed),
             Ignore(ShipmentDeliveredFailed),
             When(ShipmentCancelled)
@@ -190,6 +191,8 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
         /* start shipping part */
 
         During(OrderCancelledState,
+            Ignore(PaymentProcessedFailed),
+            Ignore(ShipmentCancelled),
             When(OrderCancelled)
                 .ThenAsync(async context =>
                 {
@@ -199,6 +202,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                 .Finalize());
 
         During(OrderCompletedState,
+            Ignore(ShipmentDelivered),
             When(OrderCompleted)
                 .ThenAsync(async context =>
                 {
@@ -217,33 +221,33 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
         );
     }
 
-    public State OrderSubmittedState { get; private set; }
-    public State PaymentProcessedState { get; private set; }
-    public State OrderConfirmedState { get; private set; }
-    public State ShipmentPreparedState { get; private set; }
+    public State OrderSubmittedState { get; private set; } = null!;
+    public State PaymentProcessedState { get; private set; } = null!;
+    public State OrderConfirmedState { get; private set; } = null!;
+    public State ShipmentPreparedState { get; private set; } = null!;
 
-    public State ShipmentDispatchedState { get; private set; }
-    public State ShipmentCancelledState { get; private set; }
-    public State OrderCompletedState { get; private set; }
-    public State OrderCancelledState { get; private set; }
+    public State ShipmentDispatchedState { get; private set; } = null!;
+    public State ShipmentCancelledState { get; private set; } = null!;
+    public State OrderCompletedState { get; private set; } = null!;
+    public State OrderCancelledState { get; private set; } = null!;
 
-    public Event<OrderSubmitted> OrderSubmitted { get; private set; }
-    public Event<OrderValidated> OrderValidated { get; private set; }
-    public Event<OrderValidatedFailed> OrderValidatedFailed { get; private set; }
-    public Event<PaymentProcessed> PaymentProcessed { get; private set; }
-    public Event<PaymentProcessedFailed> PaymentProcessedFailed { get; private set; }
-    public Event<OrderConfirmed> OrderConfirmed { get; private set; }
-    public Event<ShipmentPrepared> ShipmentPrepared { get; private set; }
+    public Event<OrderSubmitted> OrderSubmitted { get; private set; } = null!;
+    public Event<OrderValidated> OrderValidated { get; private set; } = null!;
+    public Event<OrderValidatedFailed> OrderValidatedFailed { get; private set; } = null!;
+    public Event<PaymentProcessed> PaymentProcessed { get; private set; } = null!;
+    public Event<PaymentProcessedFailed> PaymentProcessedFailed { get; private set; } = null!;
+    public Event<OrderConfirmed> OrderConfirmed { get; private set; } = null!;
+    public Event<ShipmentPrepared> ShipmentPrepared { get; private set; } = null!;
 
-    public Event<ShipmentDispatched> ShipmentDispatched { get; private set; }
-    public Event<ShipmentDispatchedFailed> ShipmentDispatchedFailed { get; private set; }
-    public Event<ShipmentDelivered> ShipmentDelivered { get; private set; }
-    public Event<ShipmentDeliveredFailed> ShipmentDeliveredFailed { get; private set; }
-    public Event<ShipmentCancelled> ShipmentCancelled { get; private set; }
+    public Event<ShipmentDispatched> ShipmentDispatched { get; private set; } = null!;
+    public Event<ShipmentDispatchedFailed> ShipmentDispatchedFailed { get; private set; } = null!;
+    public Event<ShipmentDelivered> ShipmentDelivered { get; private set; } = null!;
+    public Event<ShipmentDeliveredFailed> ShipmentDeliveredFailed { get; private set; } = null!;
+    public Event<ShipmentCancelled> ShipmentCancelled { get; private set; } = null!;
 
-    public Event<OrderCompleted> OrderCompleted { get; private set; }
-    public Event<OrderCancelled> OrderCancelled { get; private set; }
-    public Event<CheckOrder> OrderStatusRequested { get; private set; }
+    public Event<OrderCompleted> OrderCompleted { get; private set; } = null!;
+    public Event<OrderCancelled> OrderCancelled { get; private set; } = null!;
+    public Event<CheckOrder> OrderStatusRequested { get; private set; } = null!;
 
     private async Task SendAuditLogs(string eventName, Guid correlationId, string description = "")
     {

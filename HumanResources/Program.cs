@@ -10,9 +10,9 @@ builder.Services
     .AddEndpointsApiExplorer()
     .AddCustomMediatR(new[] { typeof(Employee) })
     .AddCustomValidators(new[] { typeof(Employee) })
-    .AddPersistence(builder.Configuration)
+    .AddPersistence("northwind_db", builder.Configuration)
     .AddSwaggerGen()
-    .AddSchemeRedistry(builder.Configuration.GetValue<string>("Kafka:SchemaRegistryUrl"))
+    .AddSchemeRegistry(builder.Configuration)
     .AddDaprClient();
 
 var app = builder.Build();

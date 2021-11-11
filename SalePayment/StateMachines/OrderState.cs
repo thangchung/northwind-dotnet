@@ -9,7 +9,7 @@ public class OrderState :
     public int Version { get; set; }
 
     public string CurrentState { get; set; } = default!;
-    public string FaultReason { get; set; }
+    public string FaultReason { get; set; } = null!;
 
     public Guid OrderId { get; set; }
 
@@ -19,7 +19,7 @@ public class OrderState :
     public DateTime? RequiredDate { get; set; }
 
     public decimal TotalMoney { get; set; }
-    public string TransactionId { get; set; }
+    public string TransactionId { get; set; } = null!;
 
     public DateTime? Updated { get; set; }
 }

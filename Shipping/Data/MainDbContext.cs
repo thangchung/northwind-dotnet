@@ -28,14 +28,14 @@ public class MainDbContext : AppDbContextBase
         modelBuilder.Entity<ShippingOrder>().Ignore(x => x.DomainEvents);
 
         // state
-        modelBuilder.Entity<State>().ToTable("states", Schema);
-        modelBuilder.Entity<State>().HasKey(x => x.Id);
-        modelBuilder.Entity<State>().Property(x => x.Id).HasColumnType("uuid")
+        modelBuilder.Entity<Domain.State>().ToTable("states", Schema);
+        modelBuilder.Entity<Domain.State>().HasKey(x => x.Id);
+        modelBuilder.Entity<Domain.State>().Property(x => x.Id).HasColumnType("uuid")
             .HasDefaultValueSql(Consts.UuidAlgorithm);
 
-        modelBuilder.Entity<State>().Property(x => x.Created).HasDefaultValueSql(Consts.DateAlgorithm);
+        modelBuilder.Entity<Domain.State>().Property(x => x.Created).HasDefaultValueSql(Consts.DateAlgorithm);
 
-        modelBuilder.Entity<State>().HasIndex(x => x.Id).IsUnique();
+        modelBuilder.Entity<Domain.State>().HasIndex(x => x.Id).IsUnique();
 
         // shipper info
         modelBuilder.Entity<ShipperInfo>().ToTable("shippers_info", Schema);

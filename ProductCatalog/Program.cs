@@ -11,8 +11,9 @@ builder.Services
     .AddHttpContextAccessor()
     .AddCustomMediatR(new[] { typeof(Product) })
     .AddCustomValidators(new[] { typeof(Product) })
-    .AddPersistence(builder.Configuration)
+    .AddPersistence("northwind_db", builder.Configuration)
     .AddSwaggerGen()
+    .AddSchemeRegistry(builder.Configuration)
     .AddCdCConsumers()
     .AddDaprClient();
 
@@ -37,25 +38,22 @@ app.UseSwaggerUI();
 await app.DoDbMigrationAsync(app.Logger);
 await app.DoSeedData(app.Logger);
 
-app.MapGet("/api/v1/products", async (
-    [FromHeader(Name = "x-query")] string xQuery,
-    HttpContext httpContext, ISender sender) =>
-{
-    var queryModel = httpContext.SafeGetListQuery<GetProducts.Query, ListResultModel<ProductDto>>(xQuery);
-    return await sender.Send(queryModel);
-});
+app.MapGet("/api/v1/products",
+    async ([FromHeader(Name = "x-query")] string xQuery, HttpContext httpContext, ISender sender) =>
+    {
+        var queryModel = httpContext.SafeGetListQuery<GetProducts.Query, ListResultModel<ProductDto>>(xQuery);
+        return await sender.Send(queryModel);
+    });
 
 app.MapPost("/api/v1/products",
     async (MutateProduct.CreateCommand command, ISender sender) => await sender.Send(command));
 
 app.MapPut("/api/v1/products/{id}",
-    async (Guid id, MutateProduct.UpdateCommand command, ISender sender) =>
-    {
-        command.Id = id;
-        return await sender.Send(command);
-    });
+    async (Guid id, MutateProduct.UpdateCommand command, ISender sender) => await sender.Send(command with {Id = id}));
 
 app.MapDelete("/api/v1/products/{id}",
-    async (Guid id, ISender sender) => await sender.Send(new MutateProduct.DeleteCommand(id)));
+    async (Guid id, ISender sender) => await sender.Send(new MutateProduct.DeleteCommand {Id = id}));
+
+app.MapFallback(() => Results.Redirect("/swagger"));
 
 app.Run();

@@ -16,7 +16,7 @@ namespace Shipping
         {
             var runtimeEntityType = model.AddEntityType(
                 "Shipping.Domain.State",
-                typeof(State),
+                typeof(Domain.State),
                 baseEntityType);
 
             var id = runtimeEntityType.AddProperty(
@@ -33,8 +33,8 @@ namespace Shipping
             var abbr = runtimeEntityType.AddProperty(
                 "Abbr",
                 typeof(string),
-                propertyInfo: typeof(State).GetProperty("Abbr", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(State).GetField("<Abbr>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyInfo: typeof(Domain.State).GetProperty("Abbr", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Domain.State).GetField("<Abbr>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
             abbr.AddAnnotation("Relational:ColumnName", "abbr");
 
@@ -50,16 +50,16 @@ namespace Shipping
             var name = runtimeEntityType.AddProperty(
                 "Name",
                 typeof(string),
-                propertyInfo: typeof(State).GetProperty("Name", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(State).GetField("<Name>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyInfo: typeof(Domain.State).GetProperty("Name", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Domain.State).GetField("<Name>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
             name.AddAnnotation("Relational:ColumnName", "name");
 
             var region = runtimeEntityType.AddProperty(
                 "Region",
                 typeof(string),
-                propertyInfo: typeof(State).GetProperty("Region", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(State).GetField("<Region>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyInfo: typeof(Domain.State).GetProperty("Region", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(Domain.State).GetField("<Region>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 nullable: true);
             region.AddAnnotation("Relational:ColumnName", "region");
 

@@ -34,8 +34,6 @@ namespace N8T.Infrastructure.Bus
                 .BindConfiguration(KafkaConsumerConfig.Name)
                 .Configure(configAction);
 
-            services.AddSchemeRedistry();
-
             return services;
         }
     }

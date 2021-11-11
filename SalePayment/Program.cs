@@ -11,10 +11,11 @@ builder.Services
     .AddEndpointsApiExplorer()
     .AddCustomMediatR(new[] { typeof(Order) })
     .AddCustomValidators(new[] { typeof(Order) })
-    .AddPersistence(builder.Configuration)
+    .AddPersistence("northwind_db", builder.Configuration)
     .AddSwaggerGen()
+    .AddSchemeRegistry(builder.Configuration)
     .AddCdCConsumers()
-    .AddMassTransit()
+    .AddCustomMassTransit(builder.Configuration)
     .AddGrpcClients(builder.Configuration)
     .AddDaprClient();
 
@@ -40,26 +41,14 @@ await app.DoDbMigrationAsync(app.Logger);
 await app.DoSeedData(app.Logger);
 
 app.MapPost("/api/v1/order",
-    async ([FromBody] SubmitOrder.Command model, ISender sender) => await sender.Send(model));
+    async (SubmitOrderCommand model, ISender sender) => await sender.Send(model));
 
 app.MapPost("/api/v1/payment",
-    async (ProcessPayment.Command model, ISender sender) => await sender.Send(model));
-
-app.MapPost("/api/v1/shipment/{orderId}/pick",
-    async (Guid orderId, PickShipment.Command model, ISender sender) =>
-    {
-        model.OrderId = orderId;
-        return await sender.Send(model);
-    });
-
-app.MapPost("/api/v1/shipment/{orderId}/delivery",
-    async (Guid orderId, DeliverShipment.Command model, ISender sender) =>
-    {
-        model.OrderId = orderId;
-        return await sender.Send(model);
-    });
+    async (ProcessPaymentCommand model, ISender sender) => await sender.Send(model));
 
 app.MapGet("/api/v1/order-state-machine",
-    (ISender sender) => sender.Send(new GetOrderStateMachine.Query()));
+    (ISender sender) => sender.Send(new GetOrderStateMachineQuery()));
+
+app.MapFallback(() => Results.Redirect("/swagger"));
 
 app.Run();

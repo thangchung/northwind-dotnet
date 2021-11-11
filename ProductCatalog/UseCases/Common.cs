@@ -1,14 +1,10 @@
 ﻿namespace ProductCatalog.UseCases;
 
-public class Common
-{
-}
+public record struct CategoryDto(Guid Id, string Name);
 
-public record CategoryDto(Guid Id, string Name);
-
-public record ProductDto(Guid Id, string Name, bool Discontinued)
+public record struct ProductDto(Guid Id, string Name, bool Discontinued)
 {
-    public CategoryDto? Category { get; set; }
+    public CategoryDto? Category { get; set; } = null;
 
     public ProductDto AssignCategory(CategoryDto categoryDto)
     {

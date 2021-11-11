@@ -22,7 +22,7 @@ namespace N8T.Infrastructure
     public interface IUpdateCommand<TId> : ICommand, ITxRequest
         where TId : struct
     {
-        public TId Id { get; set; }
+        public TId Id { get; init; }
     }
 
     public interface IDeleteCommand<TId> : ICommand

@@ -8,10 +8,10 @@ namespace SalePayment;
 
 public static class Extensions
 {
-    public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration config)
+    public static IServiceCollection AddPersistence(this IServiceCollection services, string connStringKey, IConfiguration config)
     {
         services.AddPostgresDbContext<MainDbContext>(
-                config.GetConnectionString("northwind_db"),
+                config.GetConnectionString(connStringKey),
                 options =>
                 {
                     options.UseModel(SalePayment.MainDbContextModel.Instance);
@@ -117,7 +117,7 @@ public static class Extensions
         return services;
     }
 
-    public static IServiceCollection AddMassTransit(this IServiceCollection services)
+    public static IServiceCollection AddCustomMassTransit(this IServiceCollection services, IConfiguration config)
     {
         services.AddMassTransit(mt =>
         {
@@ -138,7 +138,7 @@ public static class Extensions
                     /*.InMemoryRepository();*/
                     .MongoDbRepository(r =>
                     {
-                        r.Connection = "mongodb://127.0.0.1";
+                        r.Connection = config.GetValue("MassTransit:Sagas:MongoDbUrl","mongodb://127.0.0.1");
                         r.DatabaseName = "orders";
                     });
 
@@ -150,21 +150,15 @@ public static class Extensions
                 rider.AddProducer<PaymentProcessedFailed>(nameof(PaymentProcessedFailed));
                 rider.AddProducer<ShipmentPrepared>(nameof(ShipmentPrepared));
 
-                rider.AddProducer<ShipmentDispatched>(nameof(ShipmentDispatched));
-                rider.AddProducer<ShipmentDispatchedFailed>(nameof(ShipmentDispatchedFailed));
-                rider.AddProducer<ShipmentDelivered>(nameof(ShipmentDelivered));
-                rider.AddProducer<ShipmentDeliveredFailed>(nameof(ShipmentDeliveredFailed));
-                rider.AddProducer<ShipmentCancelled>(nameof(ShipmentCancelled));
-
-                rider.AddProducer<OrderCompleted>(nameof(OrderCompleted));
-
                 rider.AddProducer<OrderConfirmed>(nameof(OrderConfirmed));
                 rider.AddProducer<MoneyRefunded>(nameof(MoneyRefunded));
                 rider.AddProducer<MakeOrderValidated>(nameof(MakeOrderValidated));
 
+                rider.AddProducer<OrderCompleted>(nameof(OrderCompleted));
+
                 rider.UsingKafka((context, k) =>
                 {
-                    k.Host("localhost:9092");
+                    k.Host(config.GetValue("Kafka:BootstrapServers", "localhost:9092"));
 
                     k.TopicEndpoint<Null, OrderSubmitted>(nameof(OrderSubmitted), "Orders", c =>
                     {

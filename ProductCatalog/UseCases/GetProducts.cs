@@ -3,9 +3,9 @@ using ProductCatalog.Domain.Specs;
 
 namespace ProductCatalog.UseCases;
 
-public class GetProducts
+public struct GetProducts
 {
-    public record Query : IListQuery
+    public readonly record struct Query : IListQuery
     {
         public List<string> Includes { get; init; } = new(new[] {"SupplierInfo", "Category"});
         public List<FilterModel> Filters { get; init; } = new();
@@ -36,10 +36,6 @@ public class GetProducts
 
             public async Task<IResult> Handle(Query request, CancellationToken cancellationToken)
             {
-                // throw new Exception("throw this exception");
-
-                if (request is null) throw new ArgumentNullException(nameof(request));
-
                 var spec = new EntityListQuerySpec<Product>(request);
 
                 var products = await _productRepository.FindAsync(spec, cancellationToken);
