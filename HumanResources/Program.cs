@@ -1,39 +1,47 @@
 using HumanResources;
 using HumanResources.Data;
 using HumanResources.Domain;
+using Serilog;
 
-var builder = WebApplication.CreateBuilder(args);
-
-builder.Services
-    .AddCustomCors()
-    .AddHttpContextAccessor()
-    .AddEndpointsApiExplorer()
-    .AddCustomMediatR(new[] { typeof(Employee) })
-    .AddCustomValidators(new[] { typeof(Employee) })
-    .AddPersistence("northwind_db", builder.Configuration)
-    .AddSwaggerGen()
-    .AddSchemeRegistry(builder.Configuration)
-    .AddDaprClient();
-
-var app = builder.Build();
-
-if (!app.Environment.IsDevelopment())
+await WithSeriLog(async () =>
 {
-    app.UseExceptionHandler("/Error");
-}
+    var builder = WebApplication.CreateBuilder(args);
 
-app.MapGet("/error", () => Results.Problem("An error occurred.", statusCode: 500))
-    .ExcludeFromDescription();
+    builder.Host.AddSerilog("HumanResources");
 
-app.UseMiddleware<ExceptionMiddleware>();
+    builder.Services
+        .AddCustomCors()
+        .AddHttpContextAccessor()
+        .AddEndpointsApiExplorer()
+        .AddCustomMediatR(new[] {typeof(Employee)})
+        .AddCustomValidators(new[] {typeof(Employee)})
+        .AddPersistence("northwind_db", builder.Configuration)
+        .AddSwaggerGen()
+        .AddSchemeRegistry(builder.Configuration)
+        .AddDaprClient();
 
-app.UseCustomCors();
-app.UseRouting();
+    var app = builder.Build();
 
-app.UseSwagger();
-app.UseSwaggerUI();
+    if (!app.Environment.IsDevelopment())
+    {
+        app.UseExceptionHandler("/Error");
+    }
 
-await app.DoDbMigrationAsync(app.Logger);
-await app.DoSeedData(app.Logger);
+    app.UseSerilogRequestLogging();
 
-app.Run();
+    app.MapGet("/error", () => Results.Problem("An error occurred.", statusCode: 500))
+        .ExcludeFromDescription();
+
+    app.UseMiddleware<ExceptionMiddleware>();
+
+    app.UseCustomCors();
+    app.UseRouting();
+
+    app.UseSwagger();
+    app.UseSwaggerUI();
+
+    await app.DoDbMigrationAsync(app.Logger);
+    await app.DoSeedData(app.Logger);
+
+    app.Run();
+});

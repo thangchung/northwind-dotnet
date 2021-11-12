@@ -15,7 +15,9 @@ public class OrderConfirmedConsumer : IConsumer<OrderConfirmed>
     public async Task Consume(ConsumeContext<OrderConfirmed> context)
     {
         _logger.LogInformation(
-            $"Send notification for free-shippers or shipper hub to pick the order=${context.Message.OrderId}.");
+            "{OrderStateMachine} Send notification for free-shippers or shipper hub to pick the order={OrderId}",
+            $"OrderStateMachine[{context.Message.OrderId}]",
+            context.Message.OrderId);
 
         // todo: send notification for all free-shippers or to shipper hub, then waiting for them to pick the shipment order
         // Shipper will take action whether to pick or not at via /v1/api/shipment/{order-id}/pick

@@ -10,15 +10,17 @@ public record struct GetOrderStateMachineQuery : IQuery
     internal class Handler : RequestHandler<GetOrderStateMachineQuery, IResult>
     {
         private readonly GrpcClientFactory _grpcClientFactory;
+        private readonly ILoggerFactory _loggerFactory;
 
-        public Handler(GrpcClientFactory grpcClientFactory)
+        public Handler(GrpcClientFactory grpcClientFactory, ILoggerFactory loggerFactory)
         {
             _grpcClientFactory = grpcClientFactory;
+            _loggerFactory = loggerFactory;
         }
 
         protected override IResult Handle(GetOrderStateMachineQuery request)
         {
-            var orderStateMachine = new OrderStateMachine(_grpcClientFactory);
+            var orderStateMachine = new OrderStateMachine(_grpcClientFactory, _loggerFactory);
             var graph = orderStateMachine.GetGraph();
             var generator = new StateMachineGraphvizGenerator(graph);
             var dots = generator.CreateDotFile();

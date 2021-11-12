@@ -25,7 +25,7 @@ content-type: application/json
 # todo: provide ship information
 
 ###
-@orderId = c5767996-14c4-4e33-800e-05e3f6c3df90
+@orderId = 8fca7972-7034-491b-9f26-a53673d20aae
 
 ###
 POST {{host}}/sale-api/v1/payment HTTP/1.1
@@ -57,5 +57,5 @@ content-type: application/json
     "orderId": "{{orderId}}",
     "shipperId": "008765f8-3e46-4491-b3b4-c22fe1da9968",
     "customerId": "008765f8-3e46-4491-b3b4-c22fe1da9968",
-    "beFailedAt": "DELIVERED1"
+    "beFailedAt": "DELIVERED"
 }

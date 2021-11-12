@@ -19,7 +19,9 @@ public class MakeOrderValidatedConsumer : IConsumer<MakeOrderValidated>
     public async Task Consume(ConsumeContext<MakeOrderValidated> context)
     {
         _logger.LogInformation(
-            $"Validate the order=${context.Message.OrderId}.");
+            "{OrderStateMachine} Validate the order={OrderId}",
+            $"OrderStateMachine[{context.Message.OrderId}]",
+            context.Message.OrderId);
 
         // todo: compensation data
         // todo: submit claim money to payment gateway based on transaction_id

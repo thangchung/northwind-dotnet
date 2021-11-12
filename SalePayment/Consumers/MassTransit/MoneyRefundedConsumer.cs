@@ -20,12 +20,15 @@ public class MoneyRefundedConsumer : IConsumer<MoneyRefunded>
 
     public async Task Consume(ConsumeContext<MoneyRefunded> context)
     {
-        _logger.LogInformation(
-            $"Refund money for order=${context.Message.OrderId} of customer xxx on TransactionId xxx");
+        _logger.LogInformation("{OrderStateMachine} Refund money for order={OrderId}",
+            $"OrderStateMachine[{context.Message.OrderId}]",
+            context.Message.OrderId);
 
         // todo: compensation data
         // todo: submit claim money to payment gateway based on transaction_id
 
+
+        // send audit logs
         var auditorClient = _grpcClientFactory.CreateClient<Auditor.AuditorClient>("Auditor");
         await auditorClient.SubmitAuditAsync(new SubmitAuditRequest
         {

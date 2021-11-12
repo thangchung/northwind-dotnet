@@ -6,10 +6,12 @@ namespace SalePayment.StateMachines;
 public class OrderStateMachine : MassTransitStateMachine<OrderState>
 {
     private readonly GrpcClientFactory _grpcClientFactory;
+    private readonly ILogger _logger;
 
-    public OrderStateMachine(GrpcClientFactory grpcClientFactory)
+    public OrderStateMachine(GrpcClientFactory grpcClientFactory, ILoggerFactory logger)
     {
         _grpcClientFactory = grpcClientFactory;
+        _logger = logger.CreateLogger(nameof(OrderStateMachine));
 
         Event(() => OrderSubmitted, x =>
             x.CorrelateById(m => m.Message.OrderId));
@@ -75,7 +77,11 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                 .ThenAsync(async context =>
                 {
                     context.Instance.Updated = DateTime.UtcNow;
-                    Console.WriteLine($"[State Machine] init the state-machine for order={context.Instance.CorrelationId}.");
+
+                    _logger.LogInformation("{OrderStateMachine} Init the state-machine for order={OrderId}",
+                        $"OrderStateMachine[{context.Instance.CorrelationId}]",
+                        context.Instance.CorrelationId);
+
                     await SendAuditLogs("StateMachine.Started", context.Instance.CorrelationId);
                 })
                 .Produce(context => context.Init<MakeOrderValidated>(new
@@ -90,14 +96,20 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
             When(OrderValidated)
                 .ThenAsync(async context =>
                 {
-                    Console.WriteLine($"[State Machine] validate ok for order={context.Instance.CorrelationId}.");
+                    _logger.LogInformation("{OrderStateMachine} Validation okay for order={OrderId}",
+                        $"OrderStateMachine[{context.Instance.CorrelationId}]",
+                        context.Instance.CorrelationId);
+
                     await SendAuditLogs(nameof(OrderValidated), context.Instance.CorrelationId);
                 })
                 .TransitionTo(PaymentProcessedState),
             When(OrderValidatedFailed)
                 .ThenAsync(async context =>
                 {
-                    Console.WriteLine($"[State Machine] validate failed for order={context.Instance.CorrelationId}.");
+                    _logger.LogInformation("{OrderStateMachine} Validation failed for order={OrderId}",
+                        $"OrderStateMachine[{context.Instance.CorrelationId}]",
+                        context.Instance.CorrelationId);
+
                     await SendAuditLogs(nameof(OrderValidatedFailed), context.Instance.CorrelationId);
                 })
                 .TransitionTo(OrderCancelledState));
@@ -108,8 +120,11 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
             When(PaymentProcessed)
                 .ThenAsync(async context =>
                 {
-                    Console.WriteLine($"[State Machine] payment ok for order={context.Instance.CorrelationId}.");
                     //Console.WriteLine("Send notification for free-shipper or shipper hub.");
+                    _logger.LogInformation("{OrderStateMachine} Payment okay for order={OrderId}",
+                        $"OrderStateMachine[{context.Instance.CorrelationId}]",
+                        context.Instance.CorrelationId);
+
                     await SendAuditLogs(nameof(PaymentProcessed), context.Instance.CorrelationId);
                 })
                 .Produce(context => context.Init<OrderConfirmed>(new
@@ -120,7 +135,10 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
             When(PaymentProcessedFailed)
                 .ThenAsync(async context =>
                 {
-                    Console.WriteLine($"[State Machine] payment failed for order={context.Instance.CorrelationId}.");
+                    _logger.LogInformation("{OrderStateMachine} Payment failed for order={OrderId}",
+                        $"OrderStateMachine[{context.Instance.CorrelationId}]",
+                        context.Instance.CorrelationId);
+
                     await SendAuditLogs(nameof(PaymentProcessedFailed), context.Instance.CorrelationId);
                 })
                 .Produce(context => context.Init<MoneyRefunded>(new
@@ -134,7 +152,10 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
             When(ShipmentPrepared)
                 .ThenAsync(async context =>
                 {
-                    Console.WriteLine($"[State Machine] order confirmed ok for order={context.Instance.CorrelationId}.");
+                    _logger.LogInformation("{OrderStateMachine} Order confirmed ok for order={OrderId}",
+                        $"OrderStateMachine[{context.Instance.CorrelationId}]",
+                        context.Instance.CorrelationId);
+
                     await SendAuditLogs(nameof(ShipmentPrepared), context.Instance.CorrelationId);
                 })
                 .TransitionTo(ShipmentPreparedState));
@@ -145,14 +166,20 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
             When(ShipmentDispatched)
                 .ThenAsync(async context =>
                 {
-                    Console.WriteLine($"[State Machine] shipment dispatched ok for order={context.Instance.CorrelationId}.");
+                    _logger.LogInformation("{OrderStateMachine} Shipment dispatched ok for order={OrderId}",
+                        $"OrderStateMachine[{context.Instance.CorrelationId}]",
+                        context.Instance.CorrelationId);
+
                     await SendAuditLogs(nameof(ShipmentDispatched), context.Instance.CorrelationId);
                 })
                 .TransitionTo(ShipmentDispatchedState),
             When(ShipmentDispatchedFailed)
                 .ThenAsync(async context =>
                 {
-                    Console.WriteLine($"[State Machine] shipment dispatched failed for order={context.Instance.CorrelationId}.");
+                    _logger.LogInformation("{OrderStateMachine} Shipment dispatched failed for order={OrderId}",
+                        $"OrderStateMachine[{context.Instance.CorrelationId}]",
+                        context.Instance.CorrelationId);
+
                     await SendAuditLogs(nameof(ShipmentDispatchedFailed), context.Instance.CorrelationId);
                 })
                 .TransitionTo(ShipmentCancelledState));
@@ -162,14 +189,20 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
             When(ShipmentDelivered)
                 .ThenAsync(async context =>
                 {
-                    Console.WriteLine($"[State Machine] shipment delivered ok for order={context.Instance.CorrelationId}.");
+                    _logger.LogInformation("{OrderStateMachine} Shipment delivered ok for order={OrderId}",
+                        $"OrderStateMachine[{context.Instance.CorrelationId}]",
+                        context.Instance.CorrelationId);
+
                     await SendAuditLogs(nameof(ShipmentDispatched), context.Instance.CorrelationId);
                 })
                 .TransitionTo(OrderCompletedState),
             When(ShipmentDeliveredFailed)
                 .ThenAsync(async context =>
                 {
-                    Console.WriteLine($"[State Machine] shipment delivered failed for order={context.Instance.CorrelationId}.");
+                    _logger.LogInformation("{OrderStateMachine} Shipment delivered failed for order={OrderId}",
+                        $"OrderStateMachine[{context.Instance.CorrelationId}]",
+                        context.Instance.CorrelationId);
+
                     await SendAuditLogs(nameof(ShipmentDeliveredFailed), context.Instance.CorrelationId);
                 })
                 .TransitionTo(ShipmentCancelledState));
@@ -181,7 +214,10 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
             When(ShipmentCancelled)
                 .ThenAsync(async context =>
                 {
-                    Console.WriteLine($"[State Machine] shipment cancelled for order={context.Instance.CorrelationId}.");
+                    _logger.LogInformation("{OrderStateMachine} Shipment cancelled for order={OrderId}",
+                        $"OrderStateMachine[{context.Instance.CorrelationId}]",
+                        context.Instance.CorrelationId);
+
                     await SendAuditLogs(nameof(ShipmentCancelled), context.Instance.CorrelationId);
                 })
                 .Produce(context => context.Init<MoneyRefunded>(new
@@ -197,7 +233,10 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
             When(OrderCancelled)
                 .ThenAsync(async context =>
                 {
-                    Console.WriteLine($"[State Machine] order cancelled for order={context.Instance.CorrelationId}.");
+                    _logger.LogInformation("{OrderStateMachine} Order cancelled for order={OrderId}",
+                        $"OrderStateMachine[{context.Instance.CorrelationId}]",
+                        context.Instance.CorrelationId);
+
                     await SendAuditLogs(nameof(OrderCancelled), context.Instance.CorrelationId);
                 })
                 .Finalize());
@@ -207,7 +246,10 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
             When(OrderCompleted)
                 .ThenAsync(async context =>
                 {
-                    Console.WriteLine($"[State Machine] order completed for order={context.Instance.CorrelationId}.");
+                    _logger.LogInformation("{OrderStateMachine} Order completed for order={OrderId}",
+                        $"OrderStateMachine[{context.Instance.CorrelationId}]",
+                        context.Instance.CorrelationId);
+
                     await SendAuditLogs(nameof(OrderCompleted), context.Instance.CorrelationId);
                 })
                 .Finalize());

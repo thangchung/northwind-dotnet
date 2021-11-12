@@ -3,10 +3,10 @@ name: northwind
 # extensions:
 # - name: dapr
 #   log-level: debug
-#   config: appconfig
-#   components-path: "./components/"
+  # config: appconfig
+  # components-path: "./components/"
 # - name: zipkin
-# - name: elastic
+# - name: seq
 #   logPath: ./.logs
 
 services:
@@ -133,6 +133,20 @@ services:
       port: 27019
   tags:
     - inf
+
+- name: seq
+  image: datalust/seq
+  env_file:
+    - .env
+  bindings:
+    - name: web
+      protocol: http
+      containerPort: 80
+      port: 8341
+    - name: ingest
+      protocol: http
+      containerPort: 5341
+      port: 5341
 
 - name: humanresourcesapp
   project: HumanResources/HumanResources.csproj
