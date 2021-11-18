@@ -78,7 +78,7 @@ public struct MutateProduct
             await ExportToOutbox(
                 created,
                 () => (
-                    new ProductCreated { Id = created.Id.ToString() },
+                    new ProductCreated { ProductId = created.Id.ToString(), ProductName = created.Name},
                     new ProductOutbox(),
                     "product_cdc_events"
                 ),

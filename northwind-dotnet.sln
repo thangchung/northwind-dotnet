@@ -26,6 +26,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuditCenter", "AuditCenter\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppGateway", "AppGateway\AppGateway.csproj", "{1DCD41F0-8D79-44EA-B980-E77DFF8EF51F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorWeb", "BlazorWeb\BlazorWeb.csproj", "{DA82139F-E60E-4A39-8454-FBCEF0F95943}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -76,6 +78,10 @@ Global
 		{1DCD41F0-8D79-44EA-B980-E77DFF8EF51F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1DCD41F0-8D79-44EA-B980-E77DFF8EF51F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1DCD41F0-8D79-44EA-B980-E77DFF8EF51F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA82139F-E60E-4A39-8454-FBCEF0F95943}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA82139F-E60E-4A39-8454-FBCEF0F95943}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA82139F-E60E-4A39-8454-FBCEF0F95943}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA82139F-E60E-4A39-8454-FBCEF0F95943}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{6A9D038D-268D-4939-BE3A-0C9F3DF81191} = {DA15C935-9581-49A7-B21B-8F501D933962}

@@ -1,0 +1,121 @@
+﻿@page "/products"
+@using AntDesign.TableModels;
+@using BlazorWeb.Apis
+@using RestEase
+@inject IAppApi _appApi
+
+<PageHeader Ghost="false">
+  <PageHeaderTitle>Products</PageHeaderTitle>
+  <PageHeaderExtra>
+    <Button Type="@ButtonType.Primary" OnClick="@Create">Create</Button>
+    <Popconfirm Title="Are you sure delete this items?"
+                OnConfirm="DeleteAll"
+                OkText="Yes"
+                CancelText="No">
+      @*<Button Danger Disabled="@(_selectedItems == null || !_selectedItems.Any())">Delete All</Button>*@
+    </Popconfirm>
+  </PageHeaderExtra>
+
+  <PageHeaderContent>
+    <p>@_errorMessage</p>
+    <Table @ref="_table" DataSource="Items" TItem="ProductVM"
+               @bind-PageIndex="CurrentPage" @bind-PageSize="PageSize" Total="TotalItems"
+               @bind-SelectedRows="_selectedItems"
+               Loading="Loading" OnChange="HandleTableChange" RemoteDataSource>
+          <Selection Key="@(context.ProductId.ToString())" />
+
+          <Column TData="Guid"
+                  @bind-Field="context.ProductId"
+                  Hidden="true"/>
+
+          <Column TData="string"
+                  @bind-Field="context.ProductName"
+                  SorterCompare="@((a, b) => string.CompareOrdinal(a, b))"
+                  SortDirections="new[] {SortDirection.Descending}"
+                  SorterMultiple="1"
+                  Filterable FilterMultiple="false"/>
+
+          <Column TData="string"
+                  @bind-Field="context.CategoryName"
+                  Sortable SorterMultiple="1"/>
+
+          <Column TData="string"
+                  @bind-Field="context.SupplierName"
+                  Sortable SorterMultiple="1"/>
+
+          <ActionColumn>
+            <Space>
+              <SpaceItem><Button OnClick="() => Edit(context.ProductId)">Edit</Button></SpaceItem>
+              <SpaceItem>
+                <Popconfirm Title="Are you sure delete this item?"
+                            OnConfirm="() => Delete(context.ProductId)"
+                            OkText="Yes"
+                            CancelText="No">
+                    <Button Danger>Delete</Button>
+                </Popconfirm>
+              </SpaceItem>
+            </Space>
+          </ActionColumn>
+        </Table>
+
+  </PageHeaderContent>
+
+</PageHeader>
+
+@code {
+  private List<ProductVM> Items { get; set; } = new();
+  private IEnumerable<ProductVM> _selectedItems;
+
+  private int TotalItems { get; set; }
+  private int PageSize { get; set; } = 10;
+  private int CurrentPage { get; set; } = 1;
+  private bool Loading { get; set; } = true;
+
+  private string _errorMessage;
+  private ITable _table;
+
+  async Task Create()
+  {
+  }
+
+  async Task Edit(Guid id)
+  {
+    Console.WriteLine($"Id: {id}");
+  }
+
+  async Task Delete(Guid id)
+  {
+    Console.WriteLine($"Id: {id}");
+  }
+
+  async Task DeleteAll()
+  {
+
+  }
+
+  async Task HandleTableChange(QueryModel<ProductVM> query)
+  {
+    Loading = true;
+
+    try
+    {
+      var (listResponseModel, isError, errorMessage) = await _appApi.GetProductsAsync(CurrentPage, PageSize);
+      if (isError)
+      {
+        _errorMessage = $"Error contacting API: {errorMessage}";
+      }
+
+      Items = listResponseModel;
+      TotalItems = (int) listResponseModel.Count;
+    }
+    catch (ApiException ex)
+    {
+      _errorMessage = $"Error contacting API: {ex.Message}";
+    }
+    finally
+    {
+      Loading = false;
+      StateHasChanged();
+    }
+  }
+}

@@ -33,9 +33,9 @@ namespace N8T.Infrastructure.Bus.Kafka
         {
             return Task.Factory.StartNew(() =>
                     ConsumeTopic(stoppingToken),
-                    stoppingToken,
-                    TaskCreationOptions.LongRunning,
-                    TaskScheduler.Current);
+                stoppingToken,
+                TaskCreationOptions.LongRunning,
+                TaskScheduler.Current);
         }
 
         private async Task ConsumeTopic(CancellationToken stoppingToken)
@@ -51,6 +51,11 @@ namespace N8T.Infrastructure.Bus.Kafka
                 // the Java implementation.
                 Url = _config.SchemaRegistryUrl
             };
+
+            //_config.EnablePartitionEof = true;
+            //_config.PartitionAssignmentStrategy = PartitionAssignmentStrategy.CooperativeSticky;
+            //_config.EnableAutoCommit = false;
+            //_config.SessionTimeoutMs = 6000;
 
             using var schemaRegistry = new CachedSchemaRegistryClient(schemaRegistryConfig);
             using var consumer = new ConsumerBuilder<string, GenericRecord>(_config)
@@ -98,7 +103,7 @@ namespace N8T.Infrastructure.Bus.Kafka
                 consumer.Close();
             }
 
-            consumer.Unsubscribe();
+            // consumer.Unsubscribe();
         }
     }
 }

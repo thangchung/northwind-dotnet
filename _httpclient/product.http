@@ -1,16 +1,24 @@
 @host = http://localhost:5010
 
 ###
+GET {{host}}/product-api/healthz HTTP/1.1
+content-type: application/json
+
+###
 GET {{host}}/product-api/v1/products HTTP/1.1
 content-type: application/json
 x-query: {"filters":[],"sorts":["NameDesc"]}
+
+###
+GET {{host}}/product-api/v1/product-view/1/20 HTTP/1.1
+content-type: application/json
 
 ###
 POST {{host}}/product-api/v1/products HTTP/1.1
 content-type: application/json
 
 {
-  "name": "test product 1"
+  "name": "test product 10"
 }
 
 ###

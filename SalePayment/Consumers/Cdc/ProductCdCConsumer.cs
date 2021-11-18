@@ -18,7 +18,7 @@ public class ProductCdCConsumer :
     public async Task Handle(ProductCreated @event, CancellationToken cancellationToken)
     {
         await _dbContext.Set<ProductInfo>().AddAsync(
-            new ProductInfo(@event.Id.ConvertTo<Guid>()), cancellationToken);
+            new ProductInfo(@event.ProductId.ConvertTo<Guid>()), cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 

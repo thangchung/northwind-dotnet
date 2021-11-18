@@ -4,8 +4,28 @@
     "name": "ProductCreated",
     "fields": [
         {
-            "name": "Id",
+            "name": "ProductId",
             "type": "string"
+        },
+        {
+            "name": "ProductName",
+            "type": "string"
+        },
+        {
+            "name": "CategoryId",
+            "type": ["null", "string"]
+        },
+        {
+            "name": "CategoryName",
+            "type": ["null", "string"]
+        },
+        {
+            "name": "SupplierId",
+            "type": ["null", "string"]
+        },
+        {
+            "name": "SupplierName",
+            "type": ["null", "string"]
         }
     ]
 }

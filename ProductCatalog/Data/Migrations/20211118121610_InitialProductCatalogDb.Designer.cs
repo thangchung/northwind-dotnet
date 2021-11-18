@@ -12,7 +12,7 @@ using ProductCatalog.Data;
 namespace ProductCatalog.Data.Migrations
 {
     [DbContext(typeof(MainDbContext))]
-    [Migration("20211109042952_InitialProductCatalogDb")]
+    [Migration("20211118121610_InitialProductCatalogDb")]
     partial class InitialProductCatalogDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -199,6 +199,45 @@ namespace ProductCatalog.Data.Migrations
                         .HasDatabaseName("ix_suppliers_info_id");
 
                     b.ToTable("suppliers_info", "product_catalog");
+                });
+
+            modelBuilder.Entity("ProductCatalog.Views.ProductView", b =>
+                {
+                    b.Property<Guid>("ProductId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("product_id")
+                        .HasDefaultValueSql("uuid_generate_v4()");
+
+                    b.Property<Guid?>("CategoryId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("category_id");
+
+                    b.Property<string>("CategoryName")
+                        .HasColumnType("text")
+                        .HasColumnName("category_name");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("product_name");
+
+                    b.Property<Guid?>("SupplierId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("supplier_id");
+
+                    b.Property<string>("SupplierName")
+                        .HasColumnType("text")
+                        .HasColumnName("supplier_name");
+
+                    b.HasKey("ProductId")
+                        .HasName("pk_product_views");
+
+                    b.HasIndex("ProductId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_product_views_product_id");
+
+                    b.ToTable("product_views", "product_catalog");
                 });
 
             modelBuilder.Entity("ProductCatalog.Domain.Product", b =>

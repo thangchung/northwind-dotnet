@@ -1,5 +1,6 @@
 using ProductCatalog.Domain;
 using ProductCatalog.Domain.Outbox;
+using ProductCatalog.Views;
 
 namespace ProductCatalog.Data;
 
@@ -13,6 +14,7 @@ public class MainDbContext : AppDbContextBase
 
     public DbSet<Product> Products { get; set; } = default!;
     public DbSet<Category> Categories { get; set; } = default!;
+    public DbSet<ProductView> ProductViews { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -68,6 +70,14 @@ public class MainDbContext : AppDbContextBase
         modelBuilder.Entity<ProductOutbox>().HasIndex(x => x.Id).IsUnique();
         modelBuilder.Entity<ProductOutbox>().Ignore(x => x.Updated);
         modelBuilder.Entity<ProductOutbox>().Ignore(x => x.DomainEvents);
+
+        // views
+        modelBuilder.Entity<ProductView>().ToTable("product_views", Schema);
+        modelBuilder.Entity<ProductView>().HasKey(x => x.ProductId);
+        modelBuilder.Entity<ProductView>().Property(x => x.ProductId).HasColumnType("uuid")
+            .HasDefaultValueSql(Consts.UuidAlgorithm);
+
+        modelBuilder.Entity<ProductView>().HasIndex(x => x.ProductId).IsUnique();
     }
 }
 

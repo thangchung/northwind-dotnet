@@ -106,6 +106,18 @@ services:
   tags:
     - inf
 
+- name: restproxy
+  image: confluentinc/cp-kafka-rest:latest
+  env:
+    - KAFKA_REST_BOOTSTRAP_SERVERS=kafka:9092
+    - KAFKA_REST_SCHEMA_REGISTRY_URL=http://schema-registry:8081
+  bindings:
+    - protocol: http
+      containerPort: 8082
+      port: 8082
+  tags:
+    - inf
+
 - name: kafdrop
   image: obsidiandynamics/kafdrop:3.27.0
   env:

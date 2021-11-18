@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using ProductCatalog;
 using ProductCatalog.Data;
 using ProductCatalog.Domain;
@@ -20,7 +21,15 @@ await WithSeriLog(async () =>
         .AddSwaggerGen()
         .AddSchemeRegistry(builder.Configuration)
         .AddCdCConsumers()
-        .AddDaprClient();
+        .AddCustomDaprClient()
+        .AddHealthChecks()
+        .AddDbContextCheck<MainDbContext>()
+        .AddUrlGroup(
+            new Uri(builder.Configuration.GetValue<string>("HealthChecks:ProductCdcUrl")),
+            "Downstream - Product CDC Connector Health Check",
+            HealthStatus.Unhealthy,
+            timeout: TimeSpan.FromSeconds(3),
+            tags: new[] {"services"});
 
     var app = builder.Build();
 
@@ -45,6 +54,9 @@ await WithSeriLog(async () =>
     await app.DoDbMigrationAsync(app.Logger);
     await app.DoSeedData(app.Logger);
 
+    app.MapHealthChecks("/api/healthz");
+    app.MapFallback(() => Results.Redirect("/swagger"));
+
     app.MapGet("/api/v1/products",
         async ([FromHeader(Name = "x-query")] string xQuery, HttpContext httpContext, ISender sender) =>
         {
@@ -62,7 +74,11 @@ await WithSeriLog(async () =>
     app.MapDelete("/api/v1/products/{id}",
         async (Guid id, ISender sender) => await sender.Send(new MutateProduct.DeleteCommand {Id = id}));
 
-    app.MapFallback(() => Results.Redirect("/swagger"));
+    app.MapGet("/api/v1/product-view/{page}/{pageSize}",
+        async (int page, int pageSize, ISender sender) =>
+            await sender.Send(new GetProductView {Page = page, PageSize = pageSize}));
+
+
 
     app.Run();
 });

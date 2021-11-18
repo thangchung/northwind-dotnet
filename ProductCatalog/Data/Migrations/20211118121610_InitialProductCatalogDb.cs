@@ -49,6 +49,23 @@ namespace ProductCatalog.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "product_views",
+                schema: "product_catalog",
+                columns: table => new
+                {
+                    product_id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "uuid_generate_v4()"),
+                    product_name = table.Column<string>(type: "text", nullable: false),
+                    category_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    category_name = table.Column<string>(type: "text", nullable: true),
+                    supplier_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    supplier_name = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_product_views", x => x.product_id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "suppliers_info",
                 schema: "product_catalog",
                 columns: table => new
@@ -113,6 +130,13 @@ namespace ProductCatalog.Data.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "ix_product_views_product_id",
+                schema: "product_catalog",
+                table: "product_views",
+                column: "product_id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "ix_products_category_id",
                 schema: "product_catalog",
                 table: "products",
@@ -143,6 +167,10 @@ namespace ProductCatalog.Data.Migrations
         {
             migrationBuilder.DropTable(
                 name: "product_outboxes",
+                schema: "product_catalog");
+
+            migrationBuilder.DropTable(
+                name: "product_views",
                 schema: "product_catalog");
 
             migrationBuilder.DropTable(

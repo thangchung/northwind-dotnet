@@ -9,10 +9,18 @@ namespace N8T.Infrastructure.EfCore
     public abstract class DbContextDesignFactoryBase<TDbContext> : IDesignTimeDbContextFactory<TDbContext>
         where TDbContext : DbContext
     {
+        private readonly string _dbName;
+
+        public DbContextDesignFactoryBase(string dbName)
+        {
+            _dbName = dbName;
+        }
+
         public TDbContext CreateDbContext(string[] args)
         {
+
             var connString = ConfigurationHelper.GetConfiguration(AppContext.BaseDirectory)
-                ?.GetConnectionString("postgres"); //TODO: remove hard-code here
+                ?.GetConnectionString(_dbName);
 
             Console.WriteLine($"Connection String: {connString}");
 

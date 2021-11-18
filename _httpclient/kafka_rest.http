@@ -1,0 +1,34 @@
+@host = http://localhost:8082
+
+###
+GET {{host}}/v3/clusters HTTP/1.1
+content-type: application/json
+
+###
+@cluster_id = b6QWseZhQk6bFCDi8wSwJQ
+GET {{host}}/v3/clusters/{{cluster_id}}/topics HTTP/1.1
+content-type: application/json
+
+###
+POST {{host}}/v3/clusters/{{cluster_id}}/topics HTTP/1.1
+content-type: application/json
+
+{
+    "topic_name": "product_cdc_events",
+    "partitions_count": 1,
+    "replication_factor": 1,
+    "configs": [
+        {
+            "name": "cleanup.policy",
+            "value": "compact"
+        },
+        {
+            "name": "compression.type",
+            "value": "gzip"
+        }
+    ]
+}
+
+###
+DELETE {{host}}/v3/clusters/{{cluster_id}}/topics/product_cdc_events HTTP/1.1
+content-type: application/json

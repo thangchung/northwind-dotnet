@@ -15,4 +15,9 @@
     <ProjectReference Include="..\shared\Northwind.IntegrationEvents\Northwind.IntegrationEvents.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="6.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="6.0.0" />
+  </ItemGroup>
+
 </Project>

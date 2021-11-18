@@ -48,6 +48,12 @@ namespace N8T.Infrastructure
             //return services.AddValidatorsFromAssemblies(types.Select(t => t.Assembly));
         }
 
+        public static IServiceCollection AddCustomDaprClient(this IServiceCollection services)
+        {
+            services.AddDaprClient();
+            return services;
+        }
+
         public static IServiceCollection AddCustomCors(this IServiceCollection services, string corsName = "api",
             Action<CorsOptions> optionsAction = null)
         {

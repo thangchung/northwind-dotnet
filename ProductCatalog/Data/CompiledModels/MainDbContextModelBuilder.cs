@@ -17,6 +17,7 @@ namespace ProductCatalog
             var productOutbox = ProductOutboxEntityType.Create(this);
             var product = ProductEntityType.Create(this);
             var supplierInfo = SupplierInfoEntityType.Create(this);
+            var productView = ProductViewEntityType.Create(this);
 
             ProductEntityType.CreateForeignKey1(product, category);
             ProductEntityType.CreateForeignKey2(product, supplierInfo);
@@ -25,6 +26,7 @@ namespace ProductCatalog
             ProductOutboxEntityType.CreateAnnotations(productOutbox);
             ProductEntityType.CreateAnnotations(product);
             SupplierInfoEntityType.CreateAnnotations(supplierInfo);
+            ProductViewEntityType.CreateAnnotations(productView);
 
             AddAnnotation("Npgsql:PostgresExtension:uuid-ossp", ",,");
             AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);

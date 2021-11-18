@@ -199,6 +199,45 @@ namespace ProductCatalog.Data.Migrations
                     b.ToTable("suppliers_info", "product_catalog");
                 });
 
+            modelBuilder.Entity("ProductCatalog.Views.ProductView", b =>
+                {
+                    b.Property<Guid>("ProductId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("product_id")
+                        .HasDefaultValueSql("uuid_generate_v4()");
+
+                    b.Property<Guid?>("CategoryId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("category_id");
+
+                    b.Property<string>("CategoryName")
+                        .HasColumnType("text")
+                        .HasColumnName("category_name");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("product_name");
+
+                    b.Property<Guid?>("SupplierId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("supplier_id");
+
+                    b.Property<string>("SupplierName")
+                        .HasColumnType("text")
+                        .HasColumnName("supplier_name");
+
+                    b.HasKey("ProductId")
+                        .HasName("pk_product_views");
+
+                    b.HasIndex("ProductId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_product_views_product_id");
+
+                    b.ToTable("product_views", "product_catalog");
+                });
+
             modelBuilder.Entity("ProductCatalog.Domain.Product", b =>
                 {
                     b.HasOne("ProductCatalog.Domain.Category", "Category")
