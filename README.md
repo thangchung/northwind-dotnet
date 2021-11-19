@@ -24,6 +24,10 @@ And now you are ready to start it
 > dotnet watch run // for Blazor Web
 ```
 
+# Screen shots
+
+![](_assets/northwind-product-crud.png)
+
 # HTTP/3 with gRPC
 - https://github.com/grpc/grpc-dotnet/issues/1478
 - https://devblogs.microsoft.com/dotnet/http-3-support-in-dotnet-6/
