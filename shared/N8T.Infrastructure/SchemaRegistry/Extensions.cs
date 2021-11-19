@@ -41,7 +41,7 @@ namespace N8T.Infrastructure.SchemaRegistry
     {
         public static IServiceCollection AddSchemeRegistry(this IServiceCollection services, IConfiguration config)
         {
-            var registryUrl = config.GetValue<string>("Kafka:SchemaRegistryUrl", "http://localhost:8081");
+            var registryUrl = config.GetValue("Kafka:SchemaRegistryUrl", "http://localhost:8081");
             services.AddSingleton<ISchemaRegistryClient>(x => new CachedSchemaRegistryClient(
                 new SchemaRegistryConfig { Url = registryUrl }));
             return services;

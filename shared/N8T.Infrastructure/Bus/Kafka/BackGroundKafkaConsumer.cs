@@ -25,14 +25,13 @@ namespace N8T.Infrastructure.Bus.Kafka
             IServiceScopeFactory serviceScopeFactory, ILogger<BackGroundKafkaConsumer> logger)
         {
             _serviceScopeFactory = serviceScopeFactory;
-            _logger = logger;
             _config = config.Value;
+            _logger = logger;
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            return Task.Factory.StartNew(() =>
-                    ConsumeTopic(stoppingToken),
+            return Task.Factory.StartNew(() => ConsumeTopic(stoppingToken),
                 stoppingToken,
                 TaskCreationOptions.LongRunning,
                 TaskScheduler.Current);
@@ -52,15 +51,10 @@ namespace N8T.Infrastructure.Bus.Kafka
                 Url = _config.SchemaRegistryUrl
             };
 
-            //_config.EnablePartitionEof = true;
-            //_config.PartitionAssignmentStrategy = PartitionAssignmentStrategy.CooperativeSticky;
-            //_config.EnableAutoCommit = false;
-            //_config.SessionTimeoutMs = 6000;
-
             using var schemaRegistry = new CachedSchemaRegistryClient(schemaRegistryConfig);
             using var consumer = new ConsumerBuilder<string, GenericRecord>(_config)
-                .SetErrorHandler((_, e) => Console.WriteLine($"Error: {e.Reason}"))
-                .SetStatisticsHandler((_, json) => Console.WriteLine($"Statistics: {json}"))
+                .SetErrorHandler((_, e) => _logger.LogError($"Error: {e.Reason}"))
+                .SetStatisticsHandler((_, json) => _logger.LogInformation($"Statistics: {json}"))
                 .SetValueDeserializer(new AvroDeserializer<GenericRecord>(schemaRegistry).AsSyncOverAsync())
                 .Build();
 
@@ -72,7 +66,7 @@ namespace N8T.Infrastructure.Bus.Kafka
                 {
                     try
                     {
-                        var result = consumer.Consume(TimeSpan.FromSeconds(3));
+                        var result = consumer.Consume(stoppingToken);
 
                         if (result is null)
                             continue;
@@ -93,7 +87,7 @@ namespace N8T.Infrastructure.Bus.Kafka
                     }
                     catch (ConsumeException ex)
                     {
-                        Console.Write(ex);
+                        _logger.LogInformation(ex.Message);
                     }
                 }
             }
@@ -102,8 +96,6 @@ namespace N8T.Infrastructure.Bus.Kafka
                 // commit final offsets and leave the group.
                 consumer.Close();
             }
-
-            // consumer.Unsubscribe();
         }
     }
 }

@@ -5,7 +5,8 @@
     "fields": [
         {
             "name": "Id",
-            "type": "string"
+            "type": "string",
+            "default": ""
         }
     ]
 }

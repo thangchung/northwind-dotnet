@@ -8,10 +8,7 @@ public class GetProductView : IQuery
     public int Page { get; init; } = 1;
     public int PageSize { get; init; } = 20;
 
-    public record ProductViewModel(Guid ProductId, string ProductName, string CategoryName, string SupplierName)
-    {
-        public ProductViewModel() : this(default!, default!, default!, default!) { }
-    }
+    public record struct ProductViewModel(Guid Id, string Name, string CategoryName, string SupplierName, long ItemCount);
 
     internal class Validator : AbstractValidator<GetProductView>
     {
@@ -39,9 +36,10 @@ public class GetProductView : IQuery
             await using var conn = _mainDbContext.Database.GetDbConnection();
             await conn.OpenAsync(cancellationToken);
             var results = await conn.QueryAsync<ProductViewModel>(
-                @"SELECT product_id ProductId, product_name ProductName, category_name CategoryName, supplier_name SupplierName
-                    FROM product_catalog.product_views"
-                );
+                @"SELECT product_id ""Id"", product_name ""Name"", category_name CategoryName, supplier_name SupplierName, count(*) OVER() AS ItemCount
+                    FROM product_catalog.product_views LIMIT @PageSize OFFSET ((@Page - 1) * @PageSize)",
+                new {request.PageSize, request.Page}
+            );
 
             return Results.Ok(ResultModel<List<ProductViewModel>>.Create(results.ToList()));
         }

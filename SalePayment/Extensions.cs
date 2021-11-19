@@ -110,7 +110,7 @@ public static class Extensions
         services.AddKafkaConsumer(o =>
         {
             o.Topic = "product_cdc_events";
-            o.GroupId = "product_cdc_events_group";
+            o.GroupId = "product_cdc_events_sale_payment_group";
             o.EventResolver = async (eventFullName, bytes, schemaRegistryClient) =>
             {
                 ISpecificRecord? result = null;

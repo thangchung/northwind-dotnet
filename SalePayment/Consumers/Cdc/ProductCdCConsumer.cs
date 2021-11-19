@@ -25,7 +25,7 @@ public class ProductCdCConsumer :
     public async Task Handle(ProductUpdated @event, CancellationToken cancellationToken)
     {
         var entity = await _dbContext.Set<ProductInfo>().FirstOrDefaultAsync(
-            x=>x.ProductId == @event.Id.ConvertTo<Guid>(), cancellationToken: cancellationToken);
+            x=>x.ProductId == @event.ProductId.ConvertTo<Guid>(), cancellationToken: cancellationToken);
         if (entity is not null)
         {
             // update something

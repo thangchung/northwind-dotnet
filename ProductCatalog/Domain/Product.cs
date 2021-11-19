@@ -23,4 +23,10 @@ public class Product : EntityRootBase
     public int? UnitsOnOrder { get; private set; } = default!;
     public int? ReorderLevel { get; private set; } = default!;
     public bool Discontinued { get; private set; } = default!;
+
+    public Product AssignCategory(Guid categoryId)
+    {
+        CategoryId = categoryId;
+        return this;
+    }
 }

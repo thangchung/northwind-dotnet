@@ -2,13 +2,24 @@
 
 public record struct CategoryDto(Guid Id, string Name);
 
-public record struct ProductDto(Guid Id, string Name, bool Discontinued)
+public record ProductDto(Guid Id, string Name, bool Discontinued)
 {
-    public CategoryDto? Category { get; set; } = null;
+    public Guid? CategoryId { get; set; }
+    public string? CategoryName { get; set; }
+    public Guid? SupplierId { get; set; }
+    public string? SupplierName { get; set; }
 
-    public ProductDto AssignCategory(CategoryDto categoryDto)
+    public ProductDto AssignCategoryName(Guid? categoryId, string? categoryName)
     {
-        Category = categoryDto;
+        CategoryId = categoryId;
+        CategoryName = categoryName;
+        return this;
+    }
+
+    public ProductDto AssignSupplierName(Guid? supplierId, string? supplierName)
+    {
+        SupplierId = supplierId;
+        SupplierName = supplierName;
         return this;
     }
 };

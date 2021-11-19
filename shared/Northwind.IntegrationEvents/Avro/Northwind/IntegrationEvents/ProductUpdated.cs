@@ -15,9 +15,13 @@ namespace Northwind.IntegrationEvents
 	
 	public partial class ProductUpdated : ISpecificRecord
 	{
-		public static Schema _SCHEMA = Avro.Schema.Parse("{\"type\":\"record\",\"name\":\"ProductUpdated\",\"namespace\":\"Northwind.IntegrationEvents" +
-				"\",\"fields\":[{\"name\":\"Id\",\"type\":\"string\"}]}");
-		private string _Id;
+		public static Schema _SCHEMA = Avro.Schema.Parse(@"{""type"":""record"",""name"":""ProductUpdated"",""namespace"":""Northwind.IntegrationEvents"",""fields"":[{""name"":""ProductId"",""default"":"""",""type"":""string""},{""name"":""ProductName"",""default"":"""",""type"":""string""},{""name"":""CategoryId"",""default"":"""",""type"":[""null"",""string""]},{""name"":""CategoryName"",""default"":"""",""type"":[""null"",""string""]},{""name"":""SupplierId"",""default"":"""",""type"":[""null"",""string""]},{""name"":""SupplierName"",""default"":"""",""type"":[""null"",""string""]}]}");
+		private string _ProductId;
+		private string _ProductName;
+		private string _CategoryId;
+		private string _CategoryName;
+		private string _SupplierId;
+		private string _SupplierName;
 		public virtual Schema Schema
 		{
 			get
@@ -25,22 +29,82 @@ namespace Northwind.IntegrationEvents
 				return ProductUpdated._SCHEMA;
 			}
 		}
-		public string Id
+		public string ProductId
 		{
 			get
 			{
-				return this._Id;
+				return this._ProductId;
 			}
 			set
 			{
-				this._Id = value;
+				this._ProductId = value;
+			}
+		}
+		public string ProductName
+		{
+			get
+			{
+				return this._ProductName;
+			}
+			set
+			{
+				this._ProductName = value;
+			}
+		}
+		public string CategoryId
+		{
+			get
+			{
+				return this._CategoryId;
+			}
+			set
+			{
+				this._CategoryId = value;
+			}
+		}
+		public string CategoryName
+		{
+			get
+			{
+				return this._CategoryName;
+			}
+			set
+			{
+				this._CategoryName = value;
+			}
+		}
+		public string SupplierId
+		{
+			get
+			{
+				return this._SupplierId;
+			}
+			set
+			{
+				this._SupplierId = value;
+			}
+		}
+		public string SupplierName
+		{
+			get
+			{
+				return this._SupplierName;
+			}
+			set
+			{
+				this._SupplierName = value;
 			}
 		}
 		public virtual object Get(int fieldPos)
 		{
 			switch (fieldPos)
 			{
-			case 0: return this.Id;
+			case 0: return this.ProductId;
+			case 1: return this.ProductName;
+			case 2: return this.CategoryId;
+			case 3: return this.CategoryName;
+			case 4: return this.SupplierId;
+			case 5: return this.SupplierName;
 			default: throw new AvroRuntimeException("Bad index " + fieldPos + " in Get()");
 			};
 		}
@@ -48,7 +112,12 @@ namespace Northwind.IntegrationEvents
 		{
 			switch (fieldPos)
 			{
-			case 0: this.Id = (System.String)fieldValue; break;
+			case 0: this.ProductId = (System.String)fieldValue; break;
+			case 1: this.ProductName = (System.String)fieldValue; break;
+			case 2: this.CategoryId = (System.String)fieldValue; break;
+			case 3: this.CategoryName = (System.String)fieldValue; break;
+			case 4: this.SupplierId = (System.String)fieldValue; break;
+			case 5: this.SupplierName = (System.String)fieldValue; break;
 			default: throw new AvroRuntimeException("Bad index " + fieldPos + " in Put()");
 			};
 		}

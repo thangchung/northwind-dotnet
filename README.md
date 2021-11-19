@@ -21,6 +21,7 @@ And now you are ready to start it
 
 ```bash
 > tye run --watch
+> dotnet watch run // for Blazor Web
 ```
 
 # HTTP/3 with gRPC

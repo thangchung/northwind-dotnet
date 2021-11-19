@@ -10,7 +10,12 @@ content-type: application/json
 x-query: {"filters":[],"sorts":["NameDesc"]}
 
 ###
-GET {{host}}/product-api/v1/product-view/1/20 HTTP/1.1
+GET {{host}}/product-api/v1/product-view/1/10 HTTP/1.1
+content-type: application/json
+
+###
+@productId = 057f6797-7681-41ba-a816-25b4ba345ea9
+GET {{host}}/product-api/v1/products/{{productId}} HTTP/1.1
 content-type: application/json
 
 ###
@@ -18,12 +23,11 @@ POST {{host}}/product-api/v1/products HTTP/1.1
 content-type: application/json
 
 {
-  "name": "test product 10"
+  "name": "test product 123"
 }
 
 ###
-@productUpdateId = 942c835c-4fae-4819-8994-e2db7445d92c
-PUT {{host}}/product-api/v1/products/{{productUpdateId}} HTTP/1.1
+PUT {{host}}/product-api/v1/products/{{productId}} HTTP/1.1
 content-type: application/json
 
 {
@@ -31,6 +35,5 @@ content-type: application/json
 }
 
 ###
-@productDeleteId = 942c835c-4fae-4819-8994-e2db7445d92c
-DELETE  {{host}}/product-api/v1/products/{{productDeleteId}} HTTP/1.1
+DELETE  {{host}}/product-api/v1/products/{{productId}} HTTP/1.1
 content-type: application/json

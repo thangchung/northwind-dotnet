@@ -61,6 +61,7 @@ services:
     - KAFKA_RESTART_ATTEMPTS=10
     - KAFKA_RESTART_DELAY=5
     - ZOOKEEPER_AUTOPURGE_PURGE_INTERVAL=0
+    - KAFKA_ADVERTISED_HOST_NAME=localhost
   bindings:
     - containerPort: 9092
       port: 9092

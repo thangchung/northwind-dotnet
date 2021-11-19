@@ -12,101 +12,186 @@
                 OnConfirm="DeleteAll"
                 OkText="Yes"
                 CancelText="No">
-      @*<Button Danger Disabled="@(_selectedItems == null || !_selectedItems.Any())">Delete All</Button>*@
+      <Button Danger Disabled="@(_selectedItems is null || !_selectedItems.Any())">Delete All</Button>
     </Popconfirm>
   </PageHeaderExtra>
 
   <PageHeaderContent>
     <p>@_errorMessage</p>
     <Table @ref="_table" DataSource="Items" TItem="ProductVM"
-               @bind-PageIndex="CurrentPage" @bind-PageSize="PageSize" Total="TotalItems"
-               @bind-SelectedRows="_selectedItems"
-               Loading="Loading" OnChange="HandleTableChange" RemoteDataSource>
-          <Selection Key="@(context.ProductId.ToString())" />
+           @bind-PageIndex="CurrentPage" @bind-PageSize="PageSize" Total="TotalItems"
+           @bind-SelectedRows="_selectedItems"
+           Loading="Loading" OnChange="HandleTableChange" RemoteDataSource>
+      <Selection Key="@(context.Id.ToString())" />
 
-          <Column TData="Guid"
-                  @bind-Field="context.ProductId"
-                  Hidden="true"/>
+      <Column TData="Guid"
+              @bind-Field="context.Id"
+              Hidden="true"/>
 
-          <Column TData="string"
-                  @bind-Field="context.ProductName"
-                  SorterCompare="@((a, b) => string.CompareOrdinal(a, b))"
-                  SortDirections="new[] {SortDirection.Descending}"
-                  SorterMultiple="1"
-                  Filterable FilterMultiple="false"/>
+      <Column TData="string"
+              @bind-Field="context.Name"/>
 
-          <Column TData="string"
-                  @bind-Field="context.CategoryName"
-                  Sortable SorterMultiple="1"/>
+      <Column TData="string"
+              @bind-Field="context.CategoryName"/>
 
-          <Column TData="string"
-                  @bind-Field="context.SupplierName"
-                  Sortable SorterMultiple="1"/>
+      <Column TData="string"
+              @bind-Field="context.SupplierName"/>
 
-          <ActionColumn>
-            <Space>
-              <SpaceItem><Button OnClick="() => Edit(context.ProductId)">Edit</Button></SpaceItem>
-              <SpaceItem>
-                <Popconfirm Title="Are you sure delete this item?"
-                            OnConfirm="() => Delete(context.ProductId)"
-                            OkText="Yes"
-                            CancelText="No">
-                    <Button Danger>Delete</Button>
-                </Popconfirm>
-              </SpaceItem>
-            </Space>
-          </ActionColumn>
-        </Table>
+      <ActionColumn>
+        <Space>
+          <SpaceItem><Button OnClick="() => Edit(context.Id)">Edit</Button></SpaceItem>
+          <SpaceItem>
+            <Popconfirm Title="Are you sure delete this item?"
+                        OnConfirm="() => Delete(context.Id)"
+                        OkText="Yes"
+                        CancelText="No">
+              <Button Danger>Delete</Button>
+            </Popconfirm>
+          </SpaceItem>
+        </Space>
+      </ActionColumn>
+    </Table>
 
   </PageHeaderContent>
 
 </PageHeader>
 
+<NewProduct
+  Model="@_createModel"
+  Visible="@_openCreateProductModal"
+  OnSave="@(async model => { return _isEdit ? await _appApi.EditProductAsync(model.Id.Value, model) : await _appApi.CreateProductAsync(model); })"
+  OnClose="@(delegate((bool, ProductDto?) args) { var (visible, productDto) = args;
+                                           return OnCreateProductModalClose(visible, productDto); })"></NewProduct>
+
 @code {
   private List<ProductVM> Items { get; set; } = new();
-  private IEnumerable<ProductVM> _selectedItems;
+  private IEnumerable<ProductVM> _selectedItems = null!;
 
   private int TotalItems { get; set; }
   private int PageSize { get; set; } = 10;
   private int CurrentPage { get; set; } = 1;
   private bool Loading { get; set; } = true;
 
-  private string _errorMessage;
-  private ITable _table;
+  private string _errorMessage = null!;
+  private ITable _table = null!;
 
-  async Task Create()
+  // add product
+  private bool _openCreateProductModal;
+  private bool _isEdit;
+  private CreateProductModel _createModel = null!;
+
+  Task OnCreateProductModalClose(bool visible, ProductDto? productDto)
   {
+    _openCreateProductModal = visible;
+    if (!productDto.HasValue) return Task.CompletedTask;
+
+    var product = productDto.Value;
+    if (!_isEdit)
+    {
+      Items?.Add(new ProductVM
+      {
+        Id = product.Id,
+        Name = product.Name,
+        CategoryName = product.CategoryName!,
+        SupplierName = product.SupplierName!,
+        ItemCount = 1
+      });
+    }
+    else
+    {
+      var row = Items?.FirstOrDefault(x => x.Id == product.Id);
+      if (row is null) return Task.CompletedTask;
+
+      row.Name = product.Name;
+      row.CategoryName = product.CategoryName;
+      row.SupplierName = product.SupplierName!;
+    }
+    return Task.CompletedTask;
+  }
+
+  void Create()
+  {
+    _isEdit = false;
+
+    _createModel = new CreateProductModel
+    {
+      Name = "demo",
+    };
+
+    _openCreateProductModal = !_openCreateProductModal;
   }
 
   async Task Edit(Guid id)
   {
-    Console.WriteLine($"Id: {id}");
+    _isEdit = true;
+
+    try
+    {
+      var (result, isError, errorMessage) = await _appApi.GetProductAsync(id);
+      if (isError)
+      {
+        _errorMessage = $"Error contacting API: {errorMessage}";
+      }
+      else
+      {
+        _createModel = new CreateProductModel
+        {
+          Id = id,
+          Name = result.Name,
+          CategoryId = result.CategoryId,
+          CategoryName = result.CategoryName,
+          SupplierId = result.SupplierId,
+          SupplierName = result.SupplierName
+        };
+
+        _openCreateProductModal = !_openCreateProductModal;
+      }
+    }
+    catch (ApiException ex)
+    {
+      _errorMessage = $"Error contacting API: {ex.Message}";
+    }
   }
 
   async Task Delete(Guid id)
   {
     Console.WriteLine($"Id: {id}");
+    var (_, isError, errorMessage) = await _appApi.DeleteProductAsync(id);
+    if (isError)
+    {
+      _errorMessage = $"Error contacting API: {errorMessage}";
+    }
+    else
+    {
+      var item = Items?.FirstOrDefault(x => x.Id == id);
+      if (item is not null)
+      {
+        Items?.Remove(item);
+        TotalItems--;
+      }
+    }
   }
 
-  async Task DeleteAll()
+  Task DeleteAll()
   {
-
+    Console.WriteLine("Delete All Selected Items");
+    return Task.CompletedTask;
   }
 
-  async Task HandleTableChange(QueryModel<ProductVM> query)
+  async Task HandleTableChange(QueryModel<ProductVM>? query)
   {
     Loading = true;
 
     try
     {
-      var (listResponseModel, isError, errorMessage) = await _appApi.GetProductsAsync(CurrentPage, PageSize);
+      var (results, isError, errorMessage) = await _appApi.GetProductsAsync(CurrentPage, PageSize);
       if (isError)
       {
         _errorMessage = $"Error contacting API: {errorMessage}";
       }
 
-      Items = listResponseModel;
-      TotalItems = (int) listResponseModel.Count;
+      Items = results;
+      TotalItems = (int)results[0].ItemCount;
     }
     catch (ApiException ex)
     {

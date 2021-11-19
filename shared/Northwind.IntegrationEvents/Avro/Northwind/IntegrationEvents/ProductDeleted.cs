@@ -16,7 +16,7 @@ namespace Northwind.IntegrationEvents
 	public partial class ProductDeleted : ISpecificRecord
 	{
 		public static Schema _SCHEMA = Avro.Schema.Parse("{\"type\":\"record\",\"name\":\"ProductDeleted\",\"namespace\":\"Northwind.IntegrationEvents" +
-				"\",\"fields\":[{\"name\":\"Id\",\"type\":\"string\"}]}");
+				"\",\"fields\":[{\"name\":\"Id\",\"default\":\"\",\"type\":\"string\"}]}");
 		private string _Id;
 		public virtual Schema Schema
 		{

@@ -64,6 +64,9 @@ await WithSeriLog(async () =>
             return await sender.Send(queryModel);
         });
 
+    app.MapGet("/api/v1/products/{id}",
+        async (Guid id, ISender sender) => await sender.Send(new MutateProduct.GetQuery {Id = id}));
+
     app.MapPost("/api/v1/products",
         async (MutateProduct.CreateCommand command, ISender sender) => await sender.Send(command));
 
@@ -78,7 +81,8 @@ await WithSeriLog(async () =>
         async (int page, int pageSize, ISender sender) =>
             await sender.Send(new GetProductView {Page = page, PageSize = pageSize}));
 
-
+    app.MapGet("/api/v1/categories",
+        async (ISender sender) => await sender.Send(new GetCategoriesQuery()));
 
     app.Run();
 });

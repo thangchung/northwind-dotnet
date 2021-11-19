@@ -23,7 +23,9 @@ public static class Extensions
         /*services.AddKafkaConsumer(o =>
         {
             o.Topic = "supplier_cdc_events";
-            o.GroupId = "supplier_cdc_events_group";
+            o.GroupId = "supplier_cdc_events_product_catalog_group";
+            o.AutoOffsetReset = AutoOffsetReset.Earliest;
+            o.AllowAutoCreateTopics = true;
             o.EventResolver = async (eventFullName, bytes, schemaRegistryClient) =>
             {
                 ISpecificRecord? result = null;
@@ -47,13 +49,23 @@ public static class Extensions
         services.AddKafkaConsumer(o =>
         {
             o.Topic = "product_cdc_events";
-            o.GroupId = "product_cdc_events_group";
+            o.GroupId = "product_cdc_events_product_catalog_group";
+            o.AutoOffsetReset = AutoOffsetReset.Earliest;
+            o.AllowAutoCreateTopics = true;
             o.EventResolver = async (eventFullName, bytes, schemaRegistryClient) =>
             {
                 ISpecificRecord? result = null;
                 if (eventFullName == typeof(ProductCreated).FullName)
                 {
                     result = await bytes.DeserializeAsync<ProductCreated>(schemaRegistryClient);
+                }
+                else if (eventFullName == typeof(ProductDeleted).FullName)
+                {
+                    result = await bytes.DeserializeAsync<ProductDeleted>(schemaRegistryClient);
+                }
+                else if (eventFullName == typeof(ProductUpdated).FullName)
+                {
+                    result = await bytes.DeserializeAsync<ProductUpdated>(schemaRegistryClient);
                 }
 
                 return result;

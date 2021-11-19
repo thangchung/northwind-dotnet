@@ -5,7 +5,9 @@ namespace ProductCatalog.Consumers;
 
 // listen to yourself pattern
 public class ProductCdCConsumer :
-    INotificationHandler<ProductCreated>
+    INotificationHandler<ProductCreated>,
+    INotificationHandler<ProductUpdated>,
+    INotificationHandler<ProductDeleted>
 {
     private readonly MainDbContext _dbContext;
 
@@ -31,6 +33,35 @@ public class ProductCdCConsumer :
                 SupplierName = @event.SupplierName
             };
             await _dbContext.Set<ProductView>().AddAsync(productView, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+    }
+
+    public async Task Handle(ProductUpdated @event, CancellationToken cancellationToken)
+    {
+        var existed = await _dbContext.Set<ProductView>()
+            .FirstOrDefaultAsync(x => x.ProductId == @event.ProductId.ConvertTo<Guid>(), cancellationToken: cancellationToken);
+
+        if (existed is not null)
+        {
+            existed.ProductName = @event.ProductName;
+            existed.CategoryId = @event.CategoryId.ConvertTo<Guid>();
+            existed.CategoryName = @event.CategoryName;
+            existed.SupplierId = @event.SupplierId.ConvertTo<Guid>();
+            existed.SupplierName = @event.SupplierName;
+            _dbContext.Set<ProductView>().Update(existed);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+    }
+
+    public async Task Handle(ProductDeleted @event, CancellationToken cancellationToken)
+    {
+        var existed = await _dbContext.Set<ProductView>()
+            .FirstOrDefaultAsync(x => x.ProductId == @event.Id.ConvertTo<Guid>(), cancellationToken: cancellationToken);
+
+        if (existed is not null)
+        {
+            _dbContext.Set<ProductView>().Remove(existed);
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
     }

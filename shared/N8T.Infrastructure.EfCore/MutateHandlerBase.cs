@@ -29,6 +29,7 @@ public abstract class MutateHandlerBase<TOutBoxEntity>
         where TEvent: ISpecificRecord
     {
         var (@event, outboxEntity, topicName) = eventFunc();
+        //var subject = SubjectNameStrategy.Topic.ConstructValueSubjectName(topicName);
         var eventBytes = await @event.SerializeAsync(SchemaRegistryClient, topicName);
 
         outboxEntity.Id = Guid.NewGuid();
