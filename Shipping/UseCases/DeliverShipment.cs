@@ -1,6 +1,4 @@
-﻿using Northwind.IntegrationEvents.Contracts;
-
-namespace Shipping.UseCases;
+﻿namespace Shipping.UseCases;
 
 public record DeliverShipmentCommand : ICommand
 {
@@ -33,17 +31,14 @@ public record DeliverShipmentCommand : ICommand
     {
         private readonly ITopicProducer<ShipmentDelivered> _shipmentDeliveredTopicProducer;
         private readonly ITopicProducer<ShipmentDeliveredFailed> _shipmentDeliveredFailedTopicProducer;
-        private readonly ITopicProducer<OrderCompleted> _orderCompletedTopicProducer;
         private readonly ITopicProducer<ShipmentCancelled> _shipmentCancelledTopicProducer;
 
         public Handler(ITopicProducer<ShipmentDelivered> shipmentDeliveredTopicProducer,
             ITopicProducer<ShipmentDeliveredFailed> shipmentDeliveredFailedTopicProducer,
-            ITopicProducer<OrderCompleted> orderCompletedTopicProducer,
             ITopicProducer<ShipmentCancelled> shipmentCancelledTopicProducer)
         {
             _shipmentDeliveredTopicProducer = shipmentDeliveredTopicProducer;
             _shipmentDeliveredFailedTopicProducer = shipmentDeliveredFailedTopicProducer;
-            _orderCompletedTopicProducer = orderCompletedTopicProducer;
             _shipmentCancelledTopicProducer = shipmentCancelledTopicProducer;
         }
 
@@ -69,7 +64,6 @@ public record DeliverShipmentCommand : ICommand
             // ...
 
             await _shipmentDeliveredTopicProducer.Produce(new {request.OrderId}, cancellationToken);
-            await _orderCompletedTopicProducer.Produce(new {request.OrderId}, cancellationToken);
 
             var resultModel = ResultModel<DeliverySubmissionAccepted>.Create(
                 new DeliverySubmissionAccepted(

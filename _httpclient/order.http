@@ -5,6 +5,10 @@ GET {{host}}/sale-api/v1/order-state-machine HTTP/1.1
 content-type: application/json
 
 ###
+GET {{host}}/ship-api/v1/order-state-machine HTTP/1.1
+content-type: application/json
+
+###
 POST {{host}}/sale-api/v1/order HTTP/1.1
 content-type: application/json
 
@@ -25,7 +29,7 @@ content-type: application/json
 # todo: provide ship information
 
 ###
-@orderId = 8fca7972-7034-491b-9f26-a53673d20aae
+@orderId = 4177d958-961a-4f32-9691-f6bccac50184
 
 ###
 POST {{host}}/sale-api/v1/payment HTTP/1.1

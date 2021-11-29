@@ -24,6 +24,16 @@ And now you are ready to start it
 > dotnet watch run // for Blazor Web
 ```
 
+# Workflow
+
+- Order workflow
+
+![](_assets/order_wf.png)
+
+- Ship workflow
+
+![](_assets/ship_wf.png)
+
 # Screen shots
 
 ![](_assets/northwind-product-crud.png)

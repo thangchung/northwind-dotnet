@@ -62,3 +62,4 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 await app.DoDbMigrationAsync(app.Logger);
+app.Run();

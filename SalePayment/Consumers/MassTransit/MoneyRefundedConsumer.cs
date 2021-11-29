@@ -39,10 +39,11 @@ public class MoneyRefundedConsumer : IConsumer<MoneyRefunded>
             CorrelateId = context.CorrelationId.ToString()
         });
 
+        var reason = $"Refund money for order=${context.Message.OrderId} of customer xxx on TransactionId xxx";
         await _orderCancelledTopicProducer.Produce(new
         {
             context.Message.OrderId,
-            Reason = $"Refund money for order=${context.Message.OrderId} of customer xxx on TransactionId xxx"
+            Reason = reason
         });
 
         await Task.CompletedTask;

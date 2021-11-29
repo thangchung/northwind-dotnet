@@ -1,13 +1,13 @@
 ﻿using Automatonymous.Graphing;
 using Automatonymous.Visualizer;
 using Grpc.Net.ClientFactory;
-using SalePayment.StateMachines;
+using Shipping.StateMachines;
 
-namespace SalePayment.UseCases;
+namespace Shipping.UseCases;
 
-public record struct GetOrderStateMachineQuery : IQuery
+public record struct GetShipmentStateMachineQuery : IQuery
 {
-    internal class Handler : RequestHandler<GetOrderStateMachineQuery, IResult>
+    internal class Handler : RequestHandler<GetShipmentStateMachineQuery, IResult>
     {
         private readonly GrpcClientFactory _grpcClientFactory;
         private readonly ILoggerFactory _loggerFactory;
@@ -18,9 +18,9 @@ public record struct GetOrderStateMachineQuery : IQuery
             _loggerFactory = loggerFactory;
         }
 
-        protected override IResult Handle(GetOrderStateMachineQuery request)
+        protected override IResult Handle(GetShipmentStateMachineQuery request)
         {
-            var orderStateMachine = new OrderStateMachine(_grpcClientFactory, _loggerFactory);
+            var orderStateMachine = new ShipmentStateMachine(_grpcClientFactory, _loggerFactory);
             var graph = orderStateMachine.GetGraph();
             var generator = new StateMachineGraphvizGenerator(graph);
             var dots = generator.CreateDotFile();

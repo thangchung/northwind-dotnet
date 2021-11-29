@@ -9,10 +9,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AuditCenter\AuditCenter.csproj" />
     <ProjectReference Include="..\shared\N8T.Core\N8T.Core.csproj" />
     <ProjectReference Include="..\shared\N8T.Infrastructure.EfCore\N8T.Infrastructure.EfCore.csproj" />
     <ProjectReference Include="..\shared\N8T.Infrastructure\N8T.Infrastructure.csproj" />
     <ProjectReference Include="..\shared\Northwind.IntegrationEvents\Northwind.IntegrationEvents.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Grpc.AspNetCore" Version="2.40.0" />
+    <RuntimeHostConfigurationOption Include="System.Net.SocketsHttpHandler.Http3Support" Value="true" />
+    <Protobuf Include="..\shared\Northwind.IntegrationEvents\proto\northwind\audit\v1\audit.proto" Link="Protos\audit.proto" AdditionalImportDirs="..\shared\Northwind.IntegrationEvents\proto\" />
+    <Protobuf Include="..\shared\Northwind.IntegrationEvents\proto\northwind\audit\v1\audit_api.proto" Link="Protos\audit_api.proto" AdditionalImportDirs="..\shared\Northwind.IntegrationEvents\proto\" GrpcServices="Client" />
   </ItemGroup>
 
 </Project>

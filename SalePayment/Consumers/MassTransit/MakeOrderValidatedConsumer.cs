@@ -23,9 +23,6 @@ public class MakeOrderValidatedConsumer : IConsumer<MakeOrderValidated>
             $"OrderStateMachine[{context.Message.OrderId}]",
             context.Message.OrderId);
 
-        // todo: compensation data
-        // todo: submit claim money to payment gateway based on transaction_id
-
         await _orderValidatedTopicProducer.Produce(new
         {
             context.Message.OrderId,

@@ -6,12 +6,11 @@ namespace SalePayment.StateMachines;
 public class OrderStateMachine : MassTransitStateMachine<OrderState>
 {
     private readonly GrpcClientFactory _grpcClientFactory;
-    private readonly ILogger _logger;
 
-    public OrderStateMachine(GrpcClientFactory grpcClientFactory, ILoggerFactory logger)
+    public OrderStateMachine(GrpcClientFactory grpcClientFactory, ILoggerFactory loggerFactory)
     {
         _grpcClientFactory = grpcClientFactory;
-        _logger = logger.CreateLogger(nameof(OrderStateMachine));
+        var logger = loggerFactory.CreateLogger(nameof(OrderStateMachine));
 
         Event(() => OrderSubmitted, x =>
             x.CorrelateById(m => m.Message.OrderId));
@@ -32,24 +31,6 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
             x.CorrelateById(m => m.Message.OrderId));
 
         Event(() => OrderConfirmed, x =>
-            x.CorrelateById(m => m.Message.OrderId));
-
-        Event(() => ShipmentPrepared, x =>
-            x.CorrelateById(m => m.Message.OrderId));
-
-        Event(() => ShipmentDispatched, x =>
-            x.CorrelateById(m => m.Message.OrderId));
-
-        Event(() => ShipmentDispatchedFailed, x =>
-            x.CorrelateById(m => m.Message.OrderId));
-
-        Event(() => ShipmentDelivered, x =>
-            x.CorrelateById(m => m.Message.OrderId));
-
-        Event(() => ShipmentDeliveredFailed, x =>
-            x.CorrelateById(m => m.Message.OrderId));
-
-        Event(() => ShipmentCancelled, x =>
             x.CorrelateById(m => m.Message.OrderId));
 
         Event(() => OrderCompleted, x =>
@@ -78,7 +59,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                 {
                     context.Instance.Updated = DateTime.UtcNow;
 
-                    _logger.LogInformation("{OrderStateMachine} Init the state-machine for order={OrderId}",
+                    logger.LogInformation("{OrderStateMachine} Init the state-machine for order={OrderId}",
                         $"OrderStateMachine[{context.Instance.CorrelationId}]",
                         context.Instance.CorrelationId);
 
@@ -88,40 +69,40 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                 {
                     OrderId = context.Instance.CorrelationId, context.Instance.TransactionId
                 }))
-                .TransitionTo(OrderSubmittedState)
+                .TransitionTo(Submitted)
         );
 
-        During(OrderSubmittedState,
+        During(Submitted,
             Ignore(OrderSubmitted),
             When(OrderValidated)
                 .ThenAsync(async context =>
                 {
-                    _logger.LogInformation("{OrderStateMachine} Validation okay for order={OrderId}",
+                    logger.LogInformation("{OrderStateMachine} Validation okay for order={OrderId}",
                         $"OrderStateMachine[{context.Instance.CorrelationId}]",
                         context.Instance.CorrelationId);
 
                     await SendAuditLogs(nameof(OrderValidated), context.Instance.CorrelationId);
                 })
-                .TransitionTo(PaymentProcessedState),
+                .TransitionTo(Processed),
             When(OrderValidatedFailed)
                 .ThenAsync(async context =>
                 {
-                    _logger.LogInformation("{OrderStateMachine} Validation failed for order={OrderId}",
+                    logger.LogInformation("{OrderStateMachine} Validation failed for order={OrderId}",
                         $"OrderStateMachine[{context.Instance.CorrelationId}]",
                         context.Instance.CorrelationId);
 
                     await SendAuditLogs(nameof(OrderValidatedFailed), context.Instance.CorrelationId);
                 })
-                .TransitionTo(OrderCancelledState));
+                .TransitionTo(Cancelled));
 
-        During(PaymentProcessedState,
+        During(Processed,
             Ignore(OrderSubmitted),
             Ignore(OrderValidated),
             When(PaymentProcessed)
                 .ThenAsync(async context =>
                 {
                     //Console.WriteLine("Send notification for free-shipper or shipper hub.");
-                    _logger.LogInformation("{OrderStateMachine} Payment okay for order={OrderId}",
+                    logger.LogInformation("{OrderStateMachine} Payment okay for order={OrderId}",
                         $"OrderStateMachine[{context.Instance.CorrelationId}]",
                         context.Instance.CorrelationId);
 
@@ -131,11 +112,11 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                 {
                     OrderId = context.Instance.CorrelationId, context.Instance.TransactionId
                 }))
-                .TransitionTo(OrderConfirmedState),
+                .TransitionTo(Confirmed),
             When(PaymentProcessedFailed)
                 .ThenAsync(async context =>
                 {
-                    _logger.LogInformation("{OrderStateMachine} Payment failed for order={OrderId}",
+                    logger.LogInformation("{OrderStateMachine} Payment failed for order={OrderId}",
                         $"OrderStateMachine[{context.Instance.CorrelationId}]",
                         context.Instance.CorrelationId);
 
@@ -143,110 +124,16 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                 })
                 .Produce(context => context.Init<MoneyRefunded>(new
                 {
-                    OrderId = context.Instance.CorrelationId //, context.Instance.TransactionId
+                    OrderId = context.Instance.CorrelationId
                 }))
-                .TransitionTo(OrderCancelledState));
+                .TransitionTo(Cancelled));
 
-        During(OrderConfirmedState,
+        During(Confirmed,
             Ignore(PaymentProcessed),
-            When(ShipmentPrepared)
-                .ThenAsync(async context =>
-                {
-                    _logger.LogInformation("{OrderStateMachine} Order confirmed ok for order={OrderId}",
-                        $"OrderStateMachine[{context.Instance.CorrelationId}]",
-                        context.Instance.CorrelationId);
-
-                    await SendAuditLogs(nameof(ShipmentPrepared), context.Instance.CorrelationId);
-                })
-                .TransitionTo(ShipmentPreparedState));
-
-        /* start shipping part */
-        During(ShipmentPreparedState,
-            Ignore(ShipmentPrepared),
-            When(ShipmentDispatched)
-                .ThenAsync(async context =>
-                {
-                    _logger.LogInformation("{OrderStateMachine} Shipment dispatched ok for order={OrderId}",
-                        $"OrderStateMachine[{context.Instance.CorrelationId}]",
-                        context.Instance.CorrelationId);
-
-                    await SendAuditLogs(nameof(ShipmentDispatched), context.Instance.CorrelationId);
-                })
-                .TransitionTo(ShipmentDispatchedState),
-            When(ShipmentDispatchedFailed)
-                .ThenAsync(async context =>
-                {
-                    _logger.LogInformation("{OrderStateMachine} Shipment dispatched failed for order={OrderId}",
-                        $"OrderStateMachine[{context.Instance.CorrelationId}]",
-                        context.Instance.CorrelationId);
-
-                    await SendAuditLogs(nameof(ShipmentDispatchedFailed), context.Instance.CorrelationId);
-                })
-                .TransitionTo(ShipmentCancelledState));
-
-        During(ShipmentDispatchedState,
-            Ignore(ShipmentDispatched),
-            When(ShipmentDelivered)
-                .ThenAsync(async context =>
-                {
-                    _logger.LogInformation("{OrderStateMachine} Shipment delivered ok for order={OrderId}",
-                        $"OrderStateMachine[{context.Instance.CorrelationId}]",
-                        context.Instance.CorrelationId);
-
-                    await SendAuditLogs(nameof(ShipmentDispatched), context.Instance.CorrelationId);
-                })
-                .TransitionTo(OrderCompletedState),
-            When(ShipmentDeliveredFailed)
-                .ThenAsync(async context =>
-                {
-                    _logger.LogInformation("{OrderStateMachine} Shipment delivered failed for order={OrderId}",
-                        $"OrderStateMachine[{context.Instance.CorrelationId}]",
-                        context.Instance.CorrelationId);
-
-                    await SendAuditLogs(nameof(ShipmentDeliveredFailed), context.Instance.CorrelationId);
-                })
-                .TransitionTo(ShipmentCancelledState));
-
-        During(ShipmentCancelledState,
-            Ignore(OrderValidatedFailed),
-            Ignore(ShipmentDispatchedFailed),
-            Ignore(ShipmentDeliveredFailed),
-            When(ShipmentCancelled)
-                .ThenAsync(async context =>
-                {
-                    _logger.LogInformation("{OrderStateMachine} Shipment cancelled for order={OrderId}",
-                        $"OrderStateMachine[{context.Instance.CorrelationId}]",
-                        context.Instance.CorrelationId);
-
-                    await SendAuditLogs(nameof(ShipmentCancelled), context.Instance.CorrelationId);
-                })
-                .Produce(context => context.Init<MoneyRefunded>(new
-                {
-                    OrderId = context.Instance.CorrelationId, context.Instance.TransactionId
-                }))
-                .TransitionTo(OrderCancelledState));
-        /* start shipping part */
-
-        During(OrderCancelledState,
-            Ignore(PaymentProcessedFailed),
-            Ignore(ShipmentCancelled),
-            When(OrderCancelled)
-                .ThenAsync(async context =>
-                {
-                    _logger.LogInformation("{OrderStateMachine} Order cancelled for order={OrderId}",
-                        $"OrderStateMachine[{context.Instance.CorrelationId}]",
-                        context.Instance.CorrelationId);
-
-                    await SendAuditLogs(nameof(OrderCancelled), context.Instance.CorrelationId);
-                })
-                .Finalize());
-
-        During(OrderCompletedState,
-            Ignore(ShipmentDelivered),
             When(OrderCompleted)
                 .ThenAsync(async context =>
                 {
-                    _logger.LogInformation("{OrderStateMachine} Order completed for order={OrderId}",
+                    logger.LogInformation("{OrderStateMachine} Order completed for order={OrderId}",
                         $"OrderStateMachine[{context.Instance.CorrelationId}]",
                         context.Instance.CorrelationId);
 
@@ -254,25 +141,26 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                 })
                 .Finalize());
 
-        DuringAny(
-            When(OrderStatusRequested)
-                .RespondAsync(x => x.Init<OrderStatus>(new
+        During(Cancelled,
+            Ignore(OrderValidatedFailed), Ignore(PaymentProcessedFailed),
+            When(OrderCancelled)
+                .ThenAsync(async context =>
                 {
-                    OrderId = x.Instance.CorrelationId,
-                    State = x.Instance.CurrentState
-                }))
-        );
+                    logger.LogInformation("{OrderStateMachine} Order cancelled for order={OrderId}",
+                        $"OrderStateMachine[{context.Instance.CorrelationId}]",
+                        context.Instance.CorrelationId);
+
+                    await SendAuditLogs(nameof(OrderCancelled), context.Instance.CorrelationId);
+                })
+                .Finalize());
+
+        SetCompletedWhenFinalized();
     }
 
-    public State OrderSubmittedState { get; private set; } = null!;
-    public State PaymentProcessedState { get; private set; } = null!;
-    public State OrderConfirmedState { get; private set; } = null!;
-    public State ShipmentPreparedState { get; private set; } = null!;
-
-    public State ShipmentDispatchedState { get; private set; } = null!;
-    public State ShipmentCancelledState { get; private set; } = null!;
-    public State OrderCompletedState { get; private set; } = null!;
-    public State OrderCancelledState { get; private set; } = null!;
+    public State Submitted { get; private set; } = null!;
+    public State Processed { get; private set; } = null!;
+    public State Confirmed { get; private set; } = null!;
+    public State Cancelled { get; private set; } = null!;
 
     public Event<OrderSubmitted> OrderSubmitted { get; private set; } = null!;
     public Event<OrderValidated> OrderValidated { get; private set; } = null!;
@@ -280,14 +168,6 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
     public Event<PaymentProcessed> PaymentProcessed { get; private set; } = null!;
     public Event<PaymentProcessedFailed> PaymentProcessedFailed { get; private set; } = null!;
     public Event<OrderConfirmed> OrderConfirmed { get; private set; } = null!;
-    public Event<ShipmentPrepared> ShipmentPrepared { get; private set; } = null!;
-
-    public Event<ShipmentDispatched> ShipmentDispatched { get; private set; } = null!;
-    public Event<ShipmentDispatchedFailed> ShipmentDispatchedFailed { get; private set; } = null!;
-    public Event<ShipmentDelivered> ShipmentDelivered { get; private set; } = null!;
-    public Event<ShipmentDeliveredFailed> ShipmentDeliveredFailed { get; private set; } = null!;
-    public Event<ShipmentCancelled> ShipmentCancelled { get; private set; } = null!;
-
     public Event<OrderCompleted> OrderCompleted { get; private set; } = null!;
     public Event<OrderCancelled> OrderCancelled { get; private set; } = null!;
     public Event<CheckOrder> OrderStatusRequested { get; private set; } = null!;
@@ -298,7 +178,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
         var auditorClient = _grpcClientFactory.CreateClient<Auditor.AuditorClient>("Auditor");
         await auditorClient.SubmitAuditAsync(new SubmitAuditRequest
         {
-            Actor = "[order-state-machine]",
+            Actor = $"[{nameof(OrderStateMachine)}]",
             Event = eventName,
             Status = eventName,
             AuditedAt = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(DateTime.UtcNow),

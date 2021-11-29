@@ -226,7 +226,7 @@ public static class Extensions
                         c.ConfigureSaga<OrderState>(context);
                     });
 
-                    k.TopicEndpoint<Null, ShipmentDispatched>(nameof(ShipmentDispatched), "Orders", c =>
+                    /*k.TopicEndpoint<Null, ShipmentDispatched>(nameof(ShipmentDispatched), "Orders", c =>
                     {
                         c.AutoOffsetReset = AutoOffsetReset.Earliest;
                         c.CreateIfMissing(t => t.NumPartitions = 1);
@@ -259,7 +259,7 @@ public static class Extensions
                         c.AutoOffsetReset = AutoOffsetReset.Earliest;
                         c.CreateIfMissing(t => t.NumPartitions = 1);
                         c.ConfigureSaga<OrderState>(context);
-                    });
+                    });*/
 
                     k.TopicEndpoint<Null, OrderCompleted>(nameof(OrderCompleted), "Orders", c =>
                     {
@@ -291,7 +291,7 @@ public static class Extensions
                 });
             });
 
-            mt.AddRequestClient<CheckOrder>();
+            //mt.AddRequestClient<CheckOrder>();
         });
 
         services.AddMassTransitHostedService(true);
