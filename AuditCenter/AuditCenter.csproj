@@ -4,7 +4,8 @@
       <TargetFramework>net6.0</TargetFramework>
       <Nullable>enable</Nullable>
       <ImplicitUsings>enable</ImplicitUsings>
-      <EnablePreviewFeatures>True</EnablePreviewFeatures>
+      <!-- gRPC - http3 -->
+      <!-- <EnablePreviewFeatures>True</EnablePreviewFeatures> -->
     </PropertyGroup>
 
     <ItemGroup>

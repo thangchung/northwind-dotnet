@@ -9,6 +9,7 @@ GET {{host}}/ship-api/v1/order-state-machine HTTP/1.1
 content-type: application/json
 
 ###
+# 1: start to creat a new order
 POST {{host}}/sale-api/v1/order HTTP/1.1
 content-type: application/json
 
@@ -27,11 +28,11 @@ content-type: application/json
 }
 
 # todo: provide ship information
+###
+@orderId = 15efa9b8-bdf2-4075-bad1-0c2913142288
 
 ###
-@orderId = 4177d958-961a-4f32-9691-f6bccac50184
-
-###
+# 2: customer do a payment
 POST {{host}}/sale-api/v1/payment HTTP/1.1
 content-type: application/json
 
@@ -43,6 +44,7 @@ content-type: application/json
 }
 
 ###
+# 3: shipper starts to pick up the order for delivery
 POST {{host}}/ship-api/v1/shipment/{{orderId}}/pick HTTP/1.1
 content-type: application/json
 
@@ -54,6 +56,7 @@ content-type: application/json
 }
 
 ###
+# 4: shipper delivers the order to the customer
 POST {{host}}/ship-api/v1/shipment/{{orderId}}/delivery HTTP/1.1
 content-type: application/json
 
@@ -61,5 +64,5 @@ content-type: application/json
     "orderId": "{{orderId}}",
     "shipperId": "008765f8-3e46-4491-b3b4-c22fe1da9968",
     "customerId": "008765f8-3e46-4491-b3b4-c22fe1da9968",
-    "beFailedAt": "DELIVERED"
+    "beFailedAt": "DELIVERED1"
 }

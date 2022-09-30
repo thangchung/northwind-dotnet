@@ -11,6 +11,8 @@ POSTGRES_USER=northwind
 POSTGRES_PASSWORD=<your password>
 POSTGRES_DB=northwind_db
 
+ACCEPT_EULA=Y
+
 ConnectionStrings__northwind_db=Server=localhost;Port=5432;Database=northwind_db;User Id=northwind;Password=<your password>;
 Kafka__BootstrapServers=localhost:9092
 Kafka__SchemaRegistryUrl=http://localhost:8081
@@ -24,7 +26,25 @@ And now you are ready to start it
 > dotnet watch run // for Blazor Web
 ```
 
+# Business contexts / Boundary contexts
+
+![](_assets/boundary_contexts.png)
+
+# Inter-communication
+
+## Synchronous communication via gateway
+
+![](_assets/intercomm_sync.png)
+
+## Asynchronous communication via message broker
+
+![](_assets/intercomm_async.png)
+
 # Workflow
+
+- Full Sagas workflow
+
+![](_assets/full_sagas_wf.png)
 
 - Order workflow
 

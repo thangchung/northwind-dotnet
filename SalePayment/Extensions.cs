@@ -50,7 +50,12 @@ public static class Extensions
             })
             .ConfigureChannel(options =>
             {
-                options.HttpHandler = new Http3Handler(new HttpClientHandler());
+                // gRPC - http3
+                // options.HttpHandler = new Http3Handler(new HttpClientHandler());
+
+                var httpHandler = new HttpClientHandler();
+                httpHandler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+                options.HttpHandler = httpHandler;
             })
             .EnableCallContextPropagation(o => o.SuppressContextNotFoundErrors = true);
 

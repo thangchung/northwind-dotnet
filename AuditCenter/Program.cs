@@ -11,18 +11,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddGrpc();
 builder.WebHost.ConfigureKestrel((context, options) =>
 {
-    /*options.Listen(IPAddress.Any, 5006, listenOptions =>
+    options.Listen(IPAddress.Any, 5006, listenOptions =>
     {
         listenOptions.Protocols = HttpProtocols.Http2;
         listenOptions.UseHttps();
-    });*/
-
-    // https://devblogs.microsoft.com/dotnet/http-3-support-in-dotnet-6/
-    options.Listen(IPAddress.Any, 5006, listenOptions =>
-    {
-        listenOptions.Protocols = HttpProtocols.Http3;
-        listenOptions.UseHttps();
     });
+
+    // gRPC - http3
+    // https://devblogs.microsoft.com/dotnet/http-3-support-in-dotnet-6/
+    // options.Listen(IPAddress.Any, 5006, listenOptions =>
+    // {
+    //     listenOptions.Protocols = HttpProtocols.Http3;
+    //     listenOptions.UseHttps();
+    // });
 });
 
 var app = builder.Build();

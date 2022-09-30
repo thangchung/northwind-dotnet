@@ -14,7 +14,7 @@ GET {{host}}/product-api/v1/product-view/1/10 HTTP/1.1
 content-type: application/json
 
 ###
-@productId = 057f6797-7681-41ba-a816-25b4ba345ea9
+@productId = 3319f76e-efa2-42af-97b3-cbe75d902171
 GET {{host}}/product-api/v1/products/{{productId}} HTTP/1.1
 content-type: application/json
 
