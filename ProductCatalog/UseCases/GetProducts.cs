@@ -5,7 +5,7 @@ namespace ProductCatalog.UseCases;
 
 public struct GetProducts
 {
-    public readonly record struct Query : IListQuery
+    public readonly record struct Query() : IListQuery
     {
         public List<string> Includes { get; init; } = new(new[] {"SupplierInfo", "Category"});
         public List<FilterModel> Filters { get; init; } = new();

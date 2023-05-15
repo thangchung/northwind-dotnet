@@ -1,16 +1,19 @@
 ﻿using Grpc.Net.ClientFactory;
 using Northwind.IntegrationEvents.Protobuf.Audit.V1;
+using System.Globalization;
 
 namespace Shipping.StateMachines;
 
 public class ShipmentStateMachine : MassTransitStateMachine<ShipmentState>
 {
-    private readonly GrpcClientFactory _grpcClientFactory;
+    // private readonly GrpcClientFactory _grpcClientFactory;
+    private ILogger _logger;
 
-    public ShipmentStateMachine(GrpcClientFactory grpcClientFactory, ILoggerFactory loggerFactory)
+    public ShipmentStateMachine(/*GrpcClientFactory grpcClientFactory,*/ ILoggerFactory loggerFactory)
     {
-        _grpcClientFactory = grpcClientFactory;
+        // _grpcClientFactory = grpcClientFactory;
         var logger = loggerFactory.CreateLogger(nameof(ShipmentStateMachine));
+        _logger = logger;
 
         Event(() => ShipmentPrepared, x =>
             x.CorrelateById(m => m.Message.OrderId));
@@ -122,8 +125,18 @@ public class ShipmentStateMachine : MassTransitStateMachine<ShipmentState>
 
     private async Task SendAuditLogs(string eventName, Guid correlationId, string description = "")
     {
+        _logger.Log(LogLevel.Information, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+
+        _logger.Log(LogLevel.Information,
+            "[{Event}]-[{AuditedAt}] Actor is [{Actor}] with Order is [{CorrelateId}] and Status is [{Status}]",
+            eventName,
+            Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(DateTime.UtcNow).ToDateTime().ToString(CultureInfo.InvariantCulture),
+            $"[{nameof(ShipmentStateMachine)}]",
+            correlationId.ToString(),
+            eventName);
+
         // only for demo; in reality, we should use pub-sub for more resiliency
-        var auditorClient = _grpcClientFactory.CreateClient<Auditor.AuditorClient>("Auditor");
+        /*var auditorClient = _grpcClientFactory.CreateClient<Auditor.AuditorClient>("Auditor");
         await auditorClient.SubmitAuditAsync(new SubmitAuditRequest
         {
             Actor = $"[{nameof(ShipmentStateMachine)}]",
@@ -132,6 +145,6 @@ public class ShipmentStateMachine : MassTransitStateMachine<ShipmentState>
             AuditedAt = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(DateTime.UtcNow),
             CorrelateId = correlationId.ToString(),
             Description = description
-        });
+        });*/
     }
 }

@@ -6,10 +6,10 @@
       <TargetFramework>net6.0</TargetFramework>
       <Nullable>enable</Nullable>
       <ImplicitUsings>enable</ImplicitUsings>
+      <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AuditCenter\AuditCenter.csproj" />
     <ProjectReference Include="..\shared\N8T.Core\N8T.Core.csproj" />
     <ProjectReference Include="..\shared\N8T.Infrastructure.EfCore\N8T.Infrastructure.EfCore.csproj" />
     <ProjectReference Include="..\shared\N8T.Infrastructure\N8T.Infrastructure.csproj" />
@@ -22,6 +22,12 @@
     <!-- <RuntimeHostConfigurationOption Include="System.Net.SocketsHttpHandler.Http3Support" Value="true" /> -->
     <Protobuf Include="..\shared\Northwind.IntegrationEvents\proto\northwind\audit\v1\audit.proto" Link="Protos\audit.proto" AdditionalImportDirs="..\shared\Northwind.IntegrationEvents\proto\" />
     <Protobuf Include="..\shared\Northwind.IntegrationEvents\proto\northwind\audit\v1\audit_api.proto" Link="Protos\audit_api.proto" AdditionalImportDirs="..\shared\Northwind.IntegrationEvents\proto\" GrpcServices="Client" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\.dockerignore">
+      <Link>.dockerignore</Link>
+    </Content>
   </ItemGroup>
 
 </Project>

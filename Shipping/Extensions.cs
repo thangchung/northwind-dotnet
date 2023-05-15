@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Grpc.Core;
 using Northwind.IntegrationEvents.Protobuf.Audit.V1;
 using Shipping.Data;
 using Shipping.StateMachines;
@@ -50,6 +51,8 @@ public static class Extensions
                 var httpHandler = new HttpClientHandler();
                 httpHandler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
                 options.HttpHandler = httpHandler;
+
+                options.Credentials = ChannelCredentials.Insecure;
             })
             .EnableCallContextPropagation(o => o.SuppressContextNotFoundErrors = true);
 

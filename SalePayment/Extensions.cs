@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Grpc.Core;
 using Northwind.IntegrationEvents.Protobuf.Audit.V1;
 using SalePayment.Consumers.MassTransit;
 using SalePayment.Data;
@@ -43,12 +44,14 @@ public static class Extensions
 
     public static IServiceCollection AddGrpcClients(this IServiceCollection services, IConfiguration config)
     {
+        AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+
         services
             .AddGrpcClient<Auditor.AuditorClient>("Auditor", o =>
             {
                 o.Address = new Uri(config.GetValue<string>("AuditorGrpcUrl"));
             })
-            .ConfigureChannel(options =>
+            /*.ConfigureChannel(options =>
             {
                 // gRPC - http3
                 // options.HttpHandler = new Http3Handler(new HttpClientHandler());
@@ -56,7 +59,9 @@ public static class Extensions
                 var httpHandler = new HttpClientHandler();
                 httpHandler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
                 options.HttpHandler = httpHandler;
-            })
+
+                options.Credentials = ChannelCredentials.Insecure;
+            })*/
             .EnableCallContextPropagation(o => o.SuppressContextNotFoundErrors = true);
 
         return services;

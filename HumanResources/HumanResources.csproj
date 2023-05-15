@@ -6,6 +6,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,6 +14,12 @@
     <ProjectReference Include="..\shared\N8T.Infrastructure.EfCore\N8T.Infrastructure.EfCore.csproj" />
     <ProjectReference Include="..\shared\N8T.Infrastructure\N8T.Infrastructure.csproj" />
     <ProjectReference Include="..\shared\Northwind.IntegrationEvents\Northwind.IntegrationEvents.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\.dockerignore">
+      <Link>.dockerignore</Link>
+    </Content>
   </ItemGroup>
 
 </Project>

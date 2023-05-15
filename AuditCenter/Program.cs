@@ -2,6 +2,8 @@ using System.Net;
 using AuditCenter.Services;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 
+AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Additional configuration is required to successfully run gRPC on macOS.
@@ -14,7 +16,7 @@ builder.WebHost.ConfigureKestrel((context, options) =>
     options.Listen(IPAddress.Any, 5006, listenOptions =>
     {
         listenOptions.Protocols = HttpProtocols.Http2;
-        listenOptions.UseHttps();
+        // listenOptions.UseHttps();
     });
 
     // gRPC - http3

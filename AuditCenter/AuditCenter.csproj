@@ -4,6 +4,7 @@
       <TargetFramework>net6.0</TargetFramework>
       <Nullable>enable</Nullable>
       <ImplicitUsings>enable</ImplicitUsings>
+      <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
       <!-- gRPC - http3 -->
       <!-- <EnablePreviewFeatures>True</EnablePreviewFeatures> -->
     </PropertyGroup>
@@ -25,6 +26,12 @@
       <ProjectReference Include="..\shared\N8T.Core\N8T.Core.csproj" />
       <ProjectReference Include="..\shared\N8T.Infrastructure.EfCore\N8T.Infrastructure.EfCore.csproj" />
       <ProjectReference Include="..\shared\N8T.Infrastructure\N8T.Infrastructure.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
     </ItemGroup>
 
 </Project>

@@ -21,13 +21,13 @@ builder.Services
     .AddCdCConsumers()
     .AddCustomDaprClient()
     .AddHealthChecks()
-    .AddDbContextCheck<MainDbContext>()
-    .AddUrlGroup(
+    .AddDbContextCheck<MainDbContext>();
+    /*.AddUrlGroup(
         new Uri(builder.Configuration.GetValue<string>("HealthChecks:ProductCdcUrl")),
         "Downstream - Product CDC Connector Health Check",
         HealthStatus.Unhealthy,
         timeout: TimeSpan.FromSeconds(3),
-        tags: new[] {"services"});
+        tags: new[] {"services"});*/
 
 var app = builder.Build();
 

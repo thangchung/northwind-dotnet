@@ -1,16 +1,19 @@
-﻿using Grpc.Net.ClientFactory;
+﻿using System.Globalization;
+using Grpc.Net.ClientFactory;
 using Northwind.IntegrationEvents.Protobuf.Audit.V1;
 
 namespace SalePayment.StateMachines;
 
 public class OrderStateMachine : MassTransitStateMachine<OrderState>
 {
-    private readonly GrpcClientFactory _grpcClientFactory;
+    // private readonly GrpcClientFactory _grpcClientFactory;
+    private ILogger _logger;
 
-    public OrderStateMachine(GrpcClientFactory grpcClientFactory, ILoggerFactory loggerFactory)
+    public OrderStateMachine(/*GrpcClientFactory grpcClientFactory,*/ ILoggerFactory loggerFactory)
     {
-        _grpcClientFactory = grpcClientFactory;
+        // _grpcClientFactory = grpcClientFactory;
         var logger = loggerFactory.CreateLogger(nameof(OrderStateMachine));
+        _logger = logger;
 
         Event(() => OrderSubmitted, x =>
             x.CorrelateById(m => m.Message.OrderId));
@@ -174,9 +177,19 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
 
     private async Task SendAuditLogs(string eventName, Guid correlationId, string description = "")
     {
+        _logger.Log(LogLevel.Information, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+
+        _logger.Log(LogLevel.Information,
+            "[{Event}]-[{AuditedAt}] Actor is [{Actor}] with Order is [{CorrelateId}] and Status is [{Status}]",
+            eventName,
+            Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(DateTime.UtcNow).ToDateTime().ToString(CultureInfo.InvariantCulture),
+            $"[{nameof(OrderStateMachine)}]",
+            correlationId.ToString(),
+            eventName);
+
         // only for demo; in reality, we should use pub-sub for more resiliency
-        var auditorClient = _grpcClientFactory.CreateClient<Auditor.AuditorClient>("Auditor");
-        await auditorClient.SubmitAuditAsync(new SubmitAuditRequest
+        // var auditorClient = _grpcClientFactory.CreateClient<Auditor.AuditorClient>("Auditor");
+        /*await auditorClient.SubmitAuditAsync(new SubmitAuditRequest
         {
             Actor = $"[{nameof(OrderStateMachine)}]",
             Event = eventName,
@@ -184,6 +197,6 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
             AuditedAt = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(DateTime.UtcNow),
             CorrelateId = correlationId.ToString(),
             Description = description
-        });
+        });*/
     }
 }

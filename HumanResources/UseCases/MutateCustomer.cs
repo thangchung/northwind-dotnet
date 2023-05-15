@@ -5,7 +5,7 @@ namespace HumanResources.UseCases;
 
 public sealed class MutateCustomer
 {
-    public readonly record struct CreateCommand : ICreateCommand
+    public readonly record struct CreateCommand() : ICreateCommand
     {
         public string CompanyName { get; init; } = default!;
 
